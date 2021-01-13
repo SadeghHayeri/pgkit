@@ -11,6 +11,9 @@ click = "^7.1.2"
 Jinja2 = "^2.11.2"
 tinydb = "^4.3.0"
 
+[tool.poetry.scripts]
+pgkit = "pgkit.cli.cli:main"
+
 [tool.poetry.dev-dependencies]
 
 [build-system]
