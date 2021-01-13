@@ -3,6 +3,7 @@ from jinja2 import Template
 from pathlib import Path
 from time import sleep
 
+
 def backup(name, host, port, version, username, password, slot, delay):
     backup_destination = '/var/lib/postgresql/{}/{}'.format(version, name)
     wal_destination = '/var/lib/postgresql/wals/{}'.format(name)
@@ -11,26 +12,33 @@ def backup(name, host, port, version, username, password, slot, delay):
     stop_postgres(name, version)
     remove_initial_database(backup_destination)
     setup_receive_wal_service(name, host, port, version, username, password, slot, wal_destination)
-    print('Sleep 10s to get wal files'); sleep(1)
+    print('Sleep 10s to get wal files');
+    sleep(1)
     take_basebackup(name, host, port, version, username, password, backup_destination)
-    config_recovery_file(name, host, port, version, username, password, backup_destination, wal_destination, slot, delay)
+    config_recovery_file(name, host, port, version, username, password, backup_destination, wal_destination, slot,
+                         delay)
     start_postgres(name, version)
+
 
 def create_postgres_database(name, version):
     print('Creat postgres database')
     execute_sync('pg_createcluster {} {}'.format(version, name))
 
+
 def start_postgres(name, version):
     print('Start postgres')
     execute_sync('pg_ctlcluster {} {} start'.format(version, name))
+
 
 def stop_postgres(name, version):
     print('Stop postgres')
     execute_sync('pg_ctlcluster {} {} stop'.format(version, name))
 
+
 def remove_initial_database(destination):
     print('Remove initial database files')
     execute_sync('rm -rf {}'.format(destination))
+
 
 def setup_receive_wal_service(name, host, port, version, username, password, slot, destination):
     template_path = Path(__file__).parent / "./templates/wal-receive-service.service"
@@ -61,6 +69,7 @@ def setup_receive_wal_service(name, host, port, version, username, password, slo
     execute_sync('systemctl daemon-reload')
     print('Run wal-receive service')
     execute_sync('service receivewal-{}-{} start'.format(version, name))
+
 
 def take_basebackup(name, host, port, version, username, password, destination):
     command = '/usr/lib/postgresql/{version}/bin/pg_basebackup' \

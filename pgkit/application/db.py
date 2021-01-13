@@ -1,6 +1,6 @@
 from tinydb import TinyDB, Query
 from pgkit.application.settings import DB_PATH
-import os
+
 
 class DBClass():
     def __init__(self, db_path):
@@ -23,5 +23,6 @@ class DBClass():
 
     def get_config(self, name):
         return self.config_table.search(Query().name == name)[0]
+
 
 DB = DBClass(DB_PATH)

@@ -1,14 +1,14 @@
 import shlex
 import os
-
 import subprocess
-from time import sleep
+
 
 def get_env(env):
     process_env = os.environ.copy()
     for key, value in env:
         process_env[key] = value
     return process_env
+
 
 def execute(cmd, env=[]):
     print('######', cmd, '######')
@@ -19,6 +19,7 @@ def execute(cmd, env=[]):
     return_code = popen.wait()
     if return_code:
         raise subprocess.CalledProcessError(return_code, cmd)
+
 
 def execute_sync(cmd, env=[]):
     print('######', cmd, '######')
