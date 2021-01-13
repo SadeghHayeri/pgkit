@@ -1,0 +1,15 @@
+[Unit]
+Description=receivewal-{{version}}-{{name}}
+StartLimitIntervalSec=0
+
+[Service]
+Restart=always
+RestartSec=60
+User=postgres
+Environment="PGPASSWORD={{password}}"
+ExecStart=/usr/lib/postgresql/{{version}}/bin/pg_receivexlog --directory {{destination}} --slot {{slot}} --host {{host}} --port {{port}} --username {{username}}
+StandardOutput=append:/var/log/postgresql/receivewal-{{version}}-{{name}}.log
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target
