@@ -24,3 +24,14 @@ def execute(cmd, env=[]):
 def execute_sync(cmd, env=[]):
     print('######', cmd, '######')
     return subprocess.Popen(shlex.split(cmd), env=get_env(env)).communicate()
+
+
+def read_file(path):
+    with open(path) as file_:
+        return file_.read()
+
+
+def write_file(path, text):
+    f = open(path, 'w')
+    f.write(text)
+    f.close()

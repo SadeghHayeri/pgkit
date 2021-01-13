@@ -1,4 +1,4 @@
-from pgkit.application.utils import execute, execute_sync
+from pgkit.application.utils import execute_sync, read_file, write_file
 from jinja2 import Template
 from pathlib import Path
 from time import sleep
@@ -42,8 +42,7 @@ def remove_initial_database(destination):
 
 def setup_receive_wal_service(name, host, port, version, username, password, slot, destination):
     template_path = Path(__file__).parent / "./templates/wal-receive-service.service"
-    with open(template_path) as file_:
-        template = Template(file_.read())
+    template = Template(read_file(template_path))
 
     print('Create wal folder')
     execute_sync('mkdir {}'.format(destination))
@@ -61,9 +60,7 @@ def setup_receive_wal_service(name, host, port, version, username, password, slo
     )
 
     print('Create wal-receive service')
-    f = open('/etc/systemd/system/receivewal-{}-{}.service'.format(version, name), "w")
-    f.write(service)
-    f.close()
+    write_file('/etc/systemd/system/receivewal-{}-{}.service'.format(version, name), service)
 
     print('Reload systemctl')
     execute_sync('systemctl daemon-reload')
@@ -94,8 +91,7 @@ def take_basebackup(name, host, port, version, username, password, destination):
 
 def config_recovery_file(name, host, port, version, username, password, base_destination, wal_destination, slot, delay):
     template_path = Path(__file__).parent / "./templates/{}-recovery.conf".format(version)
-    with open(template_path) as file_:
-        template = Template(file_.read())
+    template = Template(read_file(template_path))
 
     standby_port = execute_sync("pg_lsclusters | grep {} | awk '{ print $3 }'".format(name))
 
@@ -116,11 +112,7 @@ def config_recovery_file(name, host, port, version, username, password, base_des
     )
 
     print('Create recovery.conf file')
-    if version == '12':
-        f = open('/etc/postgresql/12/{}/postgresql.conf'.format(name), "w")
-    else:
-        f = open('{}/recovery.conf'.format(base_destination), "w")
-    f.write(recovery_config)
-    f.close()
+    file_location = '/etc/postgresql/12/{}/postgresql.conf'.format(name) if version == '12' else '{}/recovery.conf'.format(base_destination)
+    write_file(file_location, recovery_config)
 
     execute_sync('chown -R postgres:postgres {}/recovery.conf'.format(base_destination))
