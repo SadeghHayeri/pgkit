@@ -1,5 +1,5 @@
 from pgkit.application.utils import execute_sync
-from pgkit.models.postgres import Postgres
+from pgkit.application.models import Postgres
 
 
 class Master(Postgres):

@@ -13,17 +13,8 @@ def pitr():
 @click.argument('delay', required=True, type=int)
 def backup(name, delay):
     config = DB.get_config(name)
-    PITR.backup(
-        name=config.name,
-        host=config.host,
-        port=config.port,
-        version=config.version,
-        username=config.username,
-        password=config.password,
-        slot=config.slot,
-        replica_port=config.replica_port,
-        replica_delay=delay
-    )
+    print(config)
+    PITR.backup(**{**config, 'replica_delay': delay})
 
 
 @pitr.command()

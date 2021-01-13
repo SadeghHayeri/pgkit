@@ -1,5 +1,4 @@
-from pgkit.models.master import Master
-from pgkit.models.replica import Replica
+from pgkit.application.models import Master, Replica
 
 
 def backup(name, host, port, version, username, password, slot, replica_port, replica_delay):

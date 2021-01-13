@@ -1,5 +1,4 @@
-from pgkit.models.postgres import Postgres
-from pgkit.models.postgres import Postgres
+from pgkit.application.models import Postgres
 from pgkit.application.utils import *
 from jinja2 import Template
 from pathlib import Path
@@ -43,7 +42,7 @@ class Replica(Postgres):
         execute_sync('rm -rf {}'.format(self.db_location))
 
     def setup_wal_receive_service(self):
-        template_path = Path(__file__).parent / "./templates/wal-receive-service.service"
+        template_path = Path(__file__).parent / "../templates/wal-receive-service.service"
         template = Template(read_file(template_path))
 
         print('Create wal folder')
@@ -79,7 +78,7 @@ class Replica(Postgres):
         chown(self.db_location, 'postgres')
 
     def configure_recovery_file(self):
-        template_path = Path(__file__).parent / "./templates/{}-recovery.conf".format(self.version)
+        template_path = Path(__file__).parent / "../templates/{}-recovery.conf".format(self.version)
         template = Template(read_file(template_path))
 
         print('Create recovery.conf file')
@@ -99,7 +98,7 @@ class Replica(Postgres):
             standby_port=self.port,
         )
 
-        file_location = f'/etc/postgresql/12/{self.name}/postgresql.conf' if self.version == '12' \
+        file_location = f'/etc/postgresql/{self.version}/{self.name}/postgresql.conf' if self.version >= 12 \
             else f'{self.db_location}/recovery.conf'
 
         write_file(file_location, recovery_config)
