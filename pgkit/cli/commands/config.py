@@ -1,6 +1,6 @@
 import click
 from pgkit.application.db import DB
-
+from pgkit.application.utils import get_free_port
 
 @click.group()
 def config():
@@ -17,7 +17,8 @@ def config():
 @click.option('--username', help='Username', required=True, prompt=True)
 @click.option('--password', help='Username', required=True, prompt=True, hide_input=True)
 def add(name, version, host, port, slot, username, password):
-    DB.add_config(name, version, host, port, slot, username, password)
+    replica_port = get_free_port()
+    DB.add_config(name, version, host, port, slot, username, password, replica_port)
 
 
 @config.command()
