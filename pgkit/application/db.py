@@ -7,12 +7,13 @@ class DBClass():
         self.db = TinyDB(db_path)
         self.config_table = self.db.table('config')
 
-    def add_config(self, name, version, host, port, slot, username, password, replica_port):
+    def add_config(self, name, version, host, port, dbname, slot, username, password, replica_port):
         self.config_table.insert({
             'name': name,
             'version': version,
             'host': host,
             'port': port,
+            'dbname': dbname,
             'slot': slot,
             'username': username,
             'password': password,

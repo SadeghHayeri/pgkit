@@ -1,6 +1,6 @@
 import click
 from pgkit.application.db import DB
-import pgkit.application.pitr as PITR
+import pgkit.application.pg as PG
 
 
 @click.group()
@@ -13,15 +13,16 @@ def pitr():
 @click.argument('delay', required=True, type=int)
 def backup(name, delay):
     config = DB.get_config(name)
-    print(config)
-    PITR.backup(**{**config, 'replica_delay': delay})
+    PG.backup(**{**config, 'replica_delay': delay})
 
 
 @pitr.command()
 def restore():
     pass
 
-
 @pitr.command()
-def status():
-    pass
+@click.argument('name', required=True)
+def status(name):
+    config = DB.get_config(name)
+    PG.print_status(**config)
+

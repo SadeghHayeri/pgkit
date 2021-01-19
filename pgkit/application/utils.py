@@ -50,6 +50,14 @@ def restart_service(service, reload_systemctl=False):
     execute_sync(f'service {service} restart')
 
 
+def stop_service(service):
+    execute_sync(f'service {service} stop')
+
+
+def get_service_status(service):
+    return execute_sync(f'systemctl status {service} --no-pager')
+
+
 def chown(path, owner):
     execute_sync(f'chown -R {owner}:{owner} {path}')
 
@@ -59,3 +67,17 @@ def get_free_port():
         s.bind(('', 0))
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         return s.getsockname()[1]
+
+
+def touch_file(path, owner='postgres'):
+    execute_sync(f'touch {path}')
+    execute_sync(f'chown -R {owner}:{owner} {path}')
+
+
+def to_number(number):
+    if type(number) == str:
+        try:
+            return int(number)
+        except ValueError:
+            return float(number)
+    return number

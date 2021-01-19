@@ -10,6 +10,7 @@ class Replica(Postgres):
         super().__init__(name=master.name,
                          host='localhost',
                          port=port,
+                         dbname='postgres',
                          version=master.version,
                          username='postgres',
                          password=None,
@@ -26,6 +27,7 @@ class Replica(Postgres):
         self.setup_wal_receive_service()
         self.master.force_switch_wal()
         sleep(10)  # time to receive first wal segments
+        self.create_base_backup()
         self.configure_recovery_file()
         self.start()
 
@@ -41,7 +43,15 @@ class Replica(Postgres):
     def remove_db_directory(self):
         execute_sync('rm -rf {}'.format(self.db_location))
 
+    def _stop_old_wal_receive_service(self):
+        try:
+            stop_service(f'receivewal-{self.version}-{self.name}')
+        except:
+            pass
+
     def setup_wal_receive_service(self):
+        self._stop_old_wal_receive_service()
+
         template_path = Path(__file__).parent / "../templates/wal-receive-service.service"
         template = Template(read_file(template_path))
 
@@ -71,7 +81,9 @@ class Replica(Postgres):
                   f' -p {self.master.port}' \
                   f' -D {self.db_location}' \
                   f' -U {self.master.username}' \
-                  f' -v --checkpoint=fast'
+                  f' -v --checkpoint=fast --progress'
+        if self.version >= 10:
+            command += ' --wal-method=none'
         execute_sync(command, env=[('PGPASSWORD', self.master.password)])
 
         print('change owner to postgres')
@@ -103,3 +115,43 @@ class Replica(Postgres):
 
         write_file(file_location, recovery_config)
         chown(file_location, 'postgres')
+
+        if self.version >= 12:
+            touch_file(f'{self.db_location}/recovery.signal')
+            touch_file(f'{self.db_location}/standby.signal')
+
+    def _get_current_delay(self):
+        file_location = f'/etc/postgresql/{self.version}/{self.name}/postgresql.conf' if self.version >= 12 \
+            else f'{self.db_location}/recovery.conf'
+
+        config = read_file(file_location)
+        for line in config.split('\n'):
+            if 'recovery_min_apply_delay' in line:
+                return int(line.split(' ')[2]) / 3600000
+
+    def _get_replication_slot_status(self):
+        return self.master.run_cmd('select active from pg_replication_slots')
+
+    def _get_postgres_logs(self, lines):
+        return execute_sync(f'tail -n {lines} /var/log/postgresql/postgresql-{self.version}-{self.name}.log')
+
+    def _get_receive_wal_logs(self, lines):
+        return execute_sync(f'tail -n {lines} /var/log/postgresql/receivewal-{self.version}-{self.name}.log')
+
+    def print_status(self):
+        print(f'# DELAY: {self._get_current_delay()}h')
+        print()
+        print('# REPLICATION SLOT:')
+        print(self._get_replication_slot_status())
+        print()
+        print('# POSTGRES REPLICA SERVICE:')
+        print(get_service_status(f'postgresql@{self.version}-{self.name}'))
+        print()
+        print('# RECEIVE WAL SERVICE:')
+        print(get_service_status(f'receivewal-{self.version}-{self.name}'))
+        print()
+        print('# POSTGRES LOGS:')
+        print(self._get_postgres_logs(10))
+        print()
+        print('# RECEIVE WAL LOGS:')
+        print(self._get_receive_wal_logs(10))

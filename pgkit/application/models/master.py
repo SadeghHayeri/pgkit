@@ -3,8 +3,8 @@ from pgkit.application.models import Postgres
 
 
 class Master(Postgres):
-    def __init__(self, name, host, port, version, username, password, slot):
-        super().__init__(name, host, port, version, username, password, slot)
+    def __init__(self, name, host, port, version, dbname, username, password, slot):
+        super().__init__(name, host, port, version, dbname, username, password, slot)
 
     def create_replica(self):
         execute_sync('pg_createcluster {} {}'.format(self.version, self.name))

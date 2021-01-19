@@ -13,12 +13,13 @@ def config():
               type=click.Choice(['9.5', '10', '11', '12', '13'], case_sensitive=False))
 @click.option('--host', help='Host IP', required=True, prompt=True)
 @click.option('--port', help='Port Number', required=True, prompt=True, type=int)
+@click.option('--dbname', help='Database Name', required=True, prompt=True)
 @click.option('--slot', help='Slot Name', required=True, prompt=True)
 @click.option('--username', help='Username', required=True, prompt=True)
 @click.option('--password', help='Username', required=True, prompt=True, hide_input=True)
-def add(name, version, host, port, slot, username, password):
+def add(name, version, host, port, dbname, slot, username, password):
     replica_port = get_free_port()
-    DB.add_config(name, version, host, port, slot, username, password, replica_port)
+    DB.add_config(name, version, host, port, dbname, slot, username, password, replica_port)
 
 
 @config.command()
