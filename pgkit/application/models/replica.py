@@ -40,6 +40,9 @@ class Replica(Postgres):
     def start(self):
         execute_sync('pg_ctlcluster {} {} start'.format(self.version, self.name))
 
+    def restart(self):
+        execute_sync('pg_ctlcluster {} {} restart'.format(self.version, self.name))
+
     def remove_db_directory(self):
         execute_sync('rm -rf {}'.format(self.db_location))
 
@@ -89,7 +92,11 @@ class Replica(Postgres):
         print('change owner to postgres')
         chown(self.db_location, 'postgres')
 
-    def configure_recovery_file(self):
+    def recovery(self, target_time):
+        self.configure_recovery_file(recovery=True, recovery_target_time=target_time)
+        self.restart()
+
+    def configure_recovery_file(self, recovery=False, recovery_target_time=None):
         template_path = Path(__file__).parent / "../templates/{}-recovery.conf".format(self.version)
         template = Template(read_file(template_path))
 
@@ -108,6 +115,8 @@ class Replica(Postgres):
             dbname='postgres',
             standby_mode='true',
             standby_port=self.port,
+            reocvery_mode=recovery,
+            recovery_target_time=recovery_target_time,
         )
 
         file_location = f'/etc/postgresql/{self.version}/{self.name}/postgresql.conf' if self.version >= 12 \

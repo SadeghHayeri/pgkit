@@ -16,7 +16,6 @@ def print_status(name, host, port, version, dbname, username, password, slot, re
 
 
 def shell(name, host, port, version, dbname, username, password, slot, replica_port, shell_to_replica):
-    print(name, host, port, version, dbname, username, password, slot, replica_port, shell_to_replica)
     master = Master(name, host, port, version, dbname, username, password, slot)
     replica = Replica(master, replica_port, None)
 
@@ -24,3 +23,10 @@ def shell(name, host, port, version, dbname, username, password, slot, replica_p
         replica.shell()
     else:
         master.shell()
+
+
+def recovery(name, host, port, version, dbname, username, password, slot, replica_port, time_to_recover):
+    master = Master(name, host, port, version, dbname, username, password, slot)
+    replica = Replica(master, replica_port, None)
+
+    replica.recovery(time_to_recover)
