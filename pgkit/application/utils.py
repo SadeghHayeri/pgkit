@@ -25,7 +25,12 @@ def execute(cmd, env=[]):
 
 def execute_sync(cmd, env=[]):
     print('######', cmd, '######')
-    return subprocess.Popen(shlex.split(cmd), env=get_env(env)).communicate()
+    return subprocess.Popen(
+        shlex.split(cmd),
+        env=get_env(env),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    ).communicate()
 
 
 def read_file(path):
