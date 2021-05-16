@@ -115,7 +115,7 @@ class Replica(Postgres):
             dbname='postgres',
             standby_mode='true',
             standby_port=self.port,
-            reocvery_mode=recovery,
+            recovery_mode=recovery,
             recovery_target_time=recovery_target_time,
         )
 
