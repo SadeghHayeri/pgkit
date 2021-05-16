@@ -16,9 +16,11 @@ def config():
 @click.option('--dbname', help='Database Name', required=True, prompt=True)
 @click.option('--slot', help='Slot Name', required=True, prompt=True)
 @click.option('--username', help='Username', required=True, prompt=True)
-@click.option('--password', help='Username', required=True, prompt=True, hide_input=True)
-def add(name, version, host, port, dbname, slot, username, password):
-    replica_port = get_free_port()
+@click.option('--password', help='Password', required=True, prompt=True, hide_input=True)
+@click.option('--replica-port', help='Replica Port', required=False, prompt=True)
+def add(name, version, host, port, dbname, slot, username, password, replica_port):
+    if not replica_port:
+        replica_port = get_free_port()
     DB.add_config(name, version, host, port, dbname, slot, username, password, replica_port)
 
 
