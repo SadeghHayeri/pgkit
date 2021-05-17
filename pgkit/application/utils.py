@@ -86,3 +86,10 @@ def to_number(number):
         except ValueError:
             return float(number)
     return number
+
+
+def removesuffix(string: str, suffix: str, /) -> str:
+    if string.endswith(suffix):
+        return string[:-len(suffix)]
+    else:
+        return string[:]
