@@ -12,7 +12,9 @@ def get_env(env):
     return process_env
 
 
-def execute(cmd, env=[]):
+def execute(cmd, env=None):
+    if env is None:
+        env = []
     print('######', cmd, '######')
     popen = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE, universal_newlines=True, env=get_env(env))
     for stdout_line in iter(popen.stdout.readline, ""):
@@ -23,7 +25,9 @@ def execute(cmd, env=[]):
         raise subprocess.CalledProcessError(return_code, cmd)
 
 
-def execute_sync(cmd, env=[]):
+def execute_sync(cmd, env=None):
+    if env is None:
+        env = []
     print('######', cmd, '######')
     return subprocess.Popen(
         shlex.split(cmd),
