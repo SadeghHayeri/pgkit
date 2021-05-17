@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 from time import sleep
 
@@ -96,6 +97,7 @@ class Replica(Postgres):
 
     def recovery(self, target_time):
         self.configure_recovery_file(recovery=True, recovery_target_time=target_time)
+        self._copy_all_wal_files_to_wal_directory()
         self.restart()
 
     def configure_recovery_file(self, recovery=False, recovery_target_time=None):
@@ -150,6 +152,18 @@ class Replica(Postgres):
                 f' -p {self.port}'
                 f' -U postgres\''
             )
+
+    def _copy_all_wal_files_to_wal_directory(self):
+        wal_location_contents = os.listdir(self.wal_location)
+        wal_destination_contents = os.listdir(os.path.join(self.db_location, 'pg_wal/'))
+        files_to_be_copied = set(wal_destination_contents).difference(wal_location_contents)
+        for file in files_to_be_copied:
+            destination_filename = removesuffix(file, '.partial')
+            shutil.copy2(
+                os.path.join(self.wal_location, file, ),
+                os.path.join(self.db_location, 'pg_wal/', destination_filename)
+            )
+
 
     def _get_current_delay(self):
         file_location = f'/etc/postgresql/{self.version}/{self.name}/postgresql.conf' if self.version >= 12 \
