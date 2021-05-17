@@ -29,12 +29,14 @@ def execute_sync(cmd, env=None):
     if env is None:
         env = []
     print('######', cmd, '######')
-    return subprocess.Popen(
+    result = subprocess.Popen(
         shlex.split(cmd),
         env=get_env(env),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     ).communicate()
+    print('*****', result, '*****')
+    return result
 
 
 def read_file(path):
