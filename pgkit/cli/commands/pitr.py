@@ -42,6 +42,13 @@ def recover(name, target_time):
 
 @pitr.command()
 @click.argument('name', required=True)
+def promote(name):
+    config = DB.get_config(name)
+    PG.promote(**config)
+
+
+@pitr.command()
+@click.argument('name', required=True)
 @click.argument('output_path', required=True)
 @click.option('--compress', required=False, is_flag=True)
 @click.option('--compression-level', required=False, type=click.Choice(list(map(str, range(1, 10)))))

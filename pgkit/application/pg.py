@@ -38,3 +38,10 @@ def dump(name, host, port, version, dbname, username, password, slot, replica_po
     replica = Replica(master, replica_port, None)
 
     replica.dump(output_path, compress, compression_level)
+
+
+def promote(name, host, port, version, dbname, username, password, slot, replica_port):
+    master = Master(name, host, port, version, dbname, username, password, slot)
+    replica = Replica(master, replica_port, None)
+
+    replica.promote()

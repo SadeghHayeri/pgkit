@@ -153,6 +153,11 @@ class Replica(Postgres):
                 f' -U postgres\''
             )
 
+    def promote(self):
+        execute_sync(
+            f'pg_ctlcluster {self.version} {self.name} promote'
+        )
+
     def _copy_all_wal_files_to_wal_directory(self):
         wal_location_contents = os.listdir(self.wal_location)
         wal_destination_contents = os.listdir(os.path.join(self.db_location, 'pg_wal/'))
