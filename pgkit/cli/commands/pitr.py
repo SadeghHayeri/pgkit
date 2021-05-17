@@ -21,11 +21,6 @@ def backup(name, delay):
 
 
 @pitr.command()
-def restore():
-    pass
-
-
-@pitr.command()
 @click.argument('name', required=True)
 def status(name):
     config = DB.get_config(name)
@@ -43,6 +38,18 @@ def recover(name, target_time):
         PG.recovery(**config, time_to_recover=date_str)
     except ValueError:
         return click.echo('target_time argument should have a valid datetime format.')
+
+
+@pitr.command()
+@click.argument('name', required=True)
+@click.argument('output_path', required=True)
+@click.option('--compress', required=False, is_flag=True)
+@click.option('--compression-level', required=False, type=click.Choice(list(map(str, range(1, 10)))))
+def dump(name, output_path, compress, compression_level):
+    if not compress and compression_level:
+        return click.echo('--compress flag should be given when compression level is specified')
+    config = DB.get_config(name)
+    PG.dump(**config, output_path=output_path, compress=compress, compression_level=compression_level)
 
 
 @pitr.command()

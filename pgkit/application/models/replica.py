@@ -1,8 +1,10 @@
-from pgkit.application.models import Postgres
-from pgkit.application.utils import *
-from jinja2 import Template
 from pathlib import Path
 from time import sleep
+
+from jinja2 import Template
+
+from pgkit.application.models import Postgres
+from pgkit.application.utils import *
 
 
 class Replica(Postgres):
@@ -128,6 +130,26 @@ class Replica(Postgres):
         if self.version >= 12:
             touch_file(f'{self.db_location}/recovery.signal')
             touch_file(f'{self.db_location}/standby.signal')
+
+    def dump(self, output_path, compress=False, compression_level=9):
+        if compress:
+            execute_sync(
+                f'runuser -l postgres '
+                f'-c \'/usr/lib/postgresql/{self.version}/bin/pg_dumpall'
+                f' --no-owner'
+                f' -p {self.port}'
+                f' -U postgres'
+                f' | gzip -{compression_level} > {output_path}\''
+            )
+        else:
+            execute_sync(
+                f'runuser -l postgres'
+                f' -c \'/usr/lib/postgresql/{self.version}/bin/pg_dumpall'
+                f' -f {output_path}'
+                f' --no-owner'
+                f' -p {self.port}'
+                f' -U postgres\''
+            )
 
     def _get_current_delay(self):
         file_location = f'/etc/postgresql/{self.version}/{self.name}/postgresql.conf' if self.version >= 12 \

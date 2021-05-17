@@ -30,3 +30,11 @@ def recovery(name, host, port, version, dbname, username, password, slot, replic
     replica = Replica(master, replica_port, None)
 
     replica.recovery(time_to_recover)
+
+
+def dump(name, host, port, version, dbname, username, password, slot, replica_port, output_path, compress=False,
+         compression_level=9):
+    master = Master(name, host, port, version, dbname, username, password, slot)
+    replica = Replica(master, replica_port, None)
+
+    replica.dump(output_path, compress, compression_level)
