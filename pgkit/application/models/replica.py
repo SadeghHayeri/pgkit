@@ -20,10 +20,13 @@ class Replica(Postgres):
                          slot=None)
         self.master = master
         self.delay = delay
-        self.db_location = '/var/lib/postgresql/{}/{}'.format(self.version, self.name)
-        self.wal_location = '/var/lib/postgresql/wals/{}/{}'.format(self.version, self.name)
+        self.db_location = f'/var/lib/postgresql/{self.version}/{self.name}'
+        self.config_location = f'/etc/postgresql/{self.version}/{self.name}'
+        self.wal_location = f'/var/lib/postgresql/wals/{self.version}/{self.name}'
 
     def start_backup(self):
+        self.stop()
+        self.remove_related_directories()
         self.create_cluster()
         self.stop()
         self.remove_db_directory()
@@ -47,7 +50,14 @@ class Replica(Postgres):
         execute_sync('pg_ctlcluster {} {} restart'.format(self.version, self.name))
 
     def remove_db_directory(self):
-        execute_sync('rm -rf {}'.format(self.db_location))  # TODO remove config
+        execute_sync(f'rm -rf {self.db_location}')
+
+    def remove_config_directory(self):
+        execute_sync(f'rm -rf {self.config_location}')
+
+    def remove_related_directories(self):
+        self.remove_db_directory()
+        self.remove_config_directory()
 
     def _stop_old_wal_receive_service(self):
         try:
