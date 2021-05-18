@@ -53,3 +53,24 @@ def promote(name, host, port, version, dbname, username, password, slot, replica
     replica = Replica(master, replica_port, None)
 
     replica.promote()
+
+
+def stop(name, host, port, version, dbname, username, password, slot, replica_port):
+    master = Master(name, host, port, version, dbname, username, password, slot)
+    replica = Replica(master, replica_port, None)
+
+    replica.stop()
+
+
+def start(name, host, port, version, dbname, username, password, slot, replica_port):
+    master = Master(name, host, port, version, dbname, username, password, slot)
+    replica = Replica(master, replica_port, None)
+
+    replica.start()
+
+
+def restart(name, host, port, version, dbname, username, password, slot, replica_port):
+    master = Master(name, host, port, version, dbname, username, password, slot)
+    replica = Replica(master, replica_port, None)
+
+    replica.restart()

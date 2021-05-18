@@ -36,3 +36,24 @@ def dumpall(name, output_path, compress, compression_level):
         return click.echo('--compress flag should be given when compression level is specified')
     config = DB.get_config(name)
     PG.dumpall(**config, output_path=output_path, compress=compress, compression_level=compression_level)
+
+
+@click.command()
+@click.argument('name', required=True)
+def stop(name):
+    config = DB.get_config(name)
+    PG.stop(**config)
+
+
+@click.command()
+@click.argument('name', required=True)
+def start(name):
+    config = DB.get_config(name)
+    PG.start(**config)
+
+
+@click.command()
+@click.argument('name', required=True)
+def restart(name):
+    config = DB.get_config(name)
+    PG.restart(**config)
