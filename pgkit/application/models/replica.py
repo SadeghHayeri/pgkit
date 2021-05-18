@@ -47,7 +47,7 @@ class Replica(Postgres):
         execute_sync('pg_ctlcluster {} {} restart'.format(self.version, self.name))
 
     def remove_db_directory(self):
-        execute_sync('rm -rf {}'.format(self.db_location))
+        execute_sync('rm -rf {}'.format(self.db_location))  # TODO remove config
 
     def _stop_old_wal_receive_service(self):
         try:
@@ -97,7 +97,7 @@ class Replica(Postgres):
 
     def recovery(self, target_time):
         self.configure_recovery_file(recovery=True, recovery_target_time=target_time)
-        self._copy_all_wal_files_to_wal_directory()
+        self._rename_partial_wal_file()
         self.restart()
 
     def configure_recovery_file(self, recovery=False, recovery_target_time=None):
@@ -133,7 +133,9 @@ class Replica(Postgres):
             touch_file(f'{self.db_location}/recovery.signal')
             touch_file(f'{self.db_location}/standby.signal')
 
-    def dump(self, output_path, compress=False, compression_level=9):
+    # todo dump
+
+    def dumpall(self, output_path, compress=False, compression_level=9):
         if compress:
             execute_sync(
                 f'runuser -l postgres '
@@ -158,17 +160,14 @@ class Replica(Postgres):
             f'pg_ctlcluster {self.version} {self.name} promote'
         )
 
-    def _copy_all_wal_files_to_wal_directory(self):
+    def _rename_partial_wal_file(self):
         wal_location_contents = os.listdir(self.wal_location)
-        wal_destination_contents = os.listdir(os.path.join(self.db_location, 'pg_wal/'))
-        files_to_be_copied = set(wal_destination_contents).difference(wal_location_contents)
-        for file in files_to_be_copied:
-            destination_filename = removesuffix(file, '.partial')
-            shutil.copy2(
-                os.path.join(self.wal_location, file, ),
-                os.path.join(self.db_location, 'pg_wal/', destination_filename)
-            )
-
+        for filename in wal_location_contents:
+            if filename.endswith('.partial'):
+                shutil.copy2(
+                    os.path.join(self.wal_location, filename),
+                    os.path.join(self.wal_location, removesuffix(filename, '.partial'))
+                )
 
     def _get_current_delay(self):
         file_location = f'/etc/postgresql/{self.version}/{self.name}/postgresql.conf' if self.version >= 12 \
