@@ -184,10 +184,12 @@ class Replica(Postgres):
         wal_location_contents = os.listdir(self.wal_location)
         for filename in wal_location_contents:
             if filename.endswith('.partial'):
+                destination_path = os.path.join(self.wal_location, removesuffix(filename, '.partial'))
                 shutil.copy2(
                     os.path.join(self.wal_location, filename),
-                    os.path.join(self.wal_location, removesuffix(filename, '.partial'))
+                    destination_path,
                 )
+                chown(destination_path, 'postgres')
 
     def _get_current_delay(self):
         file_location = f'/etc/postgresql/{self.version}/{self.name}/postgresql.conf' if self.version >= 12 \
