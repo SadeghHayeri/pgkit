@@ -133,7 +133,27 @@ class Replica(Postgres):
             touch_file(f'{self.db_location}/recovery.signal')
             touch_file(f'{self.db_location}/standby.signal')
 
-    # todo dump
+    def dump(self, database_name, output_path, compress=False, compression_level=9):
+        if compress:
+            execute_sync(
+                f'runuser -l postgres'
+                f' -c \'/usr/lib/postgresql/{self.version}/bin/pg_dump'
+                f' --no-owner'
+                f' -p {self.port}'
+                f' -U postgres'
+                f' -d {database_name}'
+                f' | gzip -{compression_level} > {output_path}\''
+            )
+        else:
+            execute_sync(
+                f'runuser -l postgres'
+                f' -c \'/usr/lib/postgresql/{self.version}/bin/pg_dump'
+                f' -f {output_path}'
+                f' --no-owner'
+                f' -p {self.port}'
+                f' -U postgres'
+                f' -d {database_name}\''
+            )
 
     def dumpall(self, output_path, compress=False, compression_level=9):
         if compress:

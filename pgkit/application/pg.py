@@ -32,12 +32,20 @@ def recovery(name, host, port, version, dbname, username, password, slot, replic
     replica.recovery(time_to_recover)
 
 
-def dump(name, host, port, version, dbname, username, password, slot, replica_port, output_path, compress=False,
-         compression_level=9):
+def dump(name, host, port, version, dbname, username, password, slot, replica_port, output_path, database_name,
+         compress=False, compression_level=9):
     master = Master(name, host, port, version, dbname, username, password, slot)
     replica = Replica(master, replica_port, None)
 
-    replica.dump(output_path, compress, compression_level)
+    replica.dump(database_name, output_path, compress, compression_level)
+
+
+def dumpall(name, host, port, version, dbname, username, password, slot, replica_port, output_path, compress=False,
+            compression_level=9):
+    master = Master(name, host, port, version, dbname, username, password, slot)
+    replica = Replica(master, replica_port, None)
+
+    replica.dumpall(output_path, compress, compression_level)
 
 
 def promote(name, host, port, version, dbname, username, password, slot, replica_port):
