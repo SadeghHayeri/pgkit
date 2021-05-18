@@ -49,32 +49,6 @@ def promote(name):
 
 @pitr.command()
 @click.argument('name', required=True)
-@click.argument('database_name', required=True)
-@click.argument('output_path', required=True)
-@click.option('--compress', required=False, is_flag=True)
-@click.option('--compression-level', required=False, type=click.Choice(list(map(str, range(1, 10)))))
-def dump(name, database_name, output_path, compress, compression_level):
-    if not compress and compression_level:
-        return click.echo('--compress flag should be given when compression level is specified')
-    config = DB.get_config(name)
-    PG.dump(**config, database_name=database_name, output_path=output_path, compress=compress,
-            compression_level=compression_level)
-
-
-@pitr.command()
-@click.argument('name', required=True)
-@click.argument('output_path', required=True)
-@click.option('--compress', required=False, is_flag=True)
-@click.option('--compression-level', required=False, type=click.Choice(list(map(str, range(1, 10)))))
-def dumpall(name, output_path, compress, compression_level):
-    if not compress and compression_level:
-        return click.echo('--compress flag should be given when compression level is specified')
-    config = DB.get_config(name)
-    PG.dumpall(**config, output_path=output_path, compress=compress, compression_level=compression_level)
-
-
-@pitr.command()
-@click.argument('name', required=True)
 @click.argument('delay', required=True, type=float)
 def status(name, delay):
     target_time = (datetime.today() - timedelta(hours=4.5)).strftime('%Y-%m-%d %H:%M:%S GMT')
