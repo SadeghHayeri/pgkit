@@ -187,6 +187,9 @@ class Replica(Postgres):
                 f' -U postgres\''
             )
 
+    def shell(self):
+        execute_sync(f'runuser -l postgres -c \'psql -p {self.port}\'', no_pipe=True)
+
     def promote(self):
         execute_sync(
             f'pg_ctlcluster {self.version} {self.name} promote'

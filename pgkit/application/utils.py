@@ -25,16 +25,22 @@ def execute(cmd, env=None):
         raise subprocess.CalledProcessError(return_code, cmd)
 
 
-def execute_sync(cmd, env=None):
+def execute_sync(cmd, env=None, no_pipe=False):
     if env is None:
         env = []
     print('######', cmd, '######')
-    result = subprocess.Popen(
-        shlex.split(cmd),
-        env=get_env(env),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    ).communicate()
+    if no_pipe:
+        result = subprocess.Popen(
+            shlex.split(cmd),
+            env=get_env(env),
+        ).communicate()
+    else:
+        result = subprocess.Popen(
+            shlex.split(cmd),
+            env=get_env(env),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        ).communicate()
     print('*****', result, '*****')
     return result
 
