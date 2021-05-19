@@ -113,6 +113,7 @@ class Replica(Postgres):
     def configure_recovery_file(self, recovery=False, recovery_target_time=None):
         template_path = Path(__file__).parent / "../templates/{}-recovery.conf".format(self.version)
         template = Template(read_file(template_path))
+        latest = recovery_target_time == 'latest'
 
         print('Create recovery.conf file')
         recovery_config = template.render(
@@ -131,6 +132,7 @@ class Replica(Postgres):
             standby_port=self.port,
             recovery_mode=recovery,
             recovery_target_time=recovery_target_time,
+            latest=latest
         )
 
         file_location = f'/etc/postgresql/{self.version}/{self.name}/postgresql.conf' if self.version >= 12 \

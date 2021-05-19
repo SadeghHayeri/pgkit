@@ -32,12 +32,13 @@ def status(name):
 @click.argument('target_time', required=True)
 def recover(name, target_time):
     config = DB.get_config(name)
-    try:
-        parsed_target_date = parse_date(target_time)
-        date_str = str(timezone('Asia/Tehran').localize(parsed_target_date))
-        PG.recovery(**config, time_to_recover=date_str)
-    except ValueError:
-        return click.echo('target_time argument should have a valid datetime format.')
+    if target_time != 'latest':
+        try:
+            parsed_target_date = parse_date(target_time)
+            target_time = str(timezone('Asia/Tehran').localize(parsed_target_date))
+        except ValueError:
+            return click.echo('target_time argument should have a valid datetime format.')
+    PG.recovery(**config, time_to_recover=target_time)
 
 
 @pitr.command()
