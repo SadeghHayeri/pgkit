@@ -55,9 +55,13 @@ class Replica(Postgres):
     def remove_config_directory(self):
         execute_sync(f'rm -rf {self.config_location}')
 
+    def remove_existing_wal_files(self):
+        execute_sync(f'rm -rf {self.wal_location}')
+
     def remove_related_directories(self):
         self.remove_db_directory()
         self.remove_config_directory()
+        self.remove_existing_wal_files()
 
     def _stop_old_wal_receive_service(self):
         try:
