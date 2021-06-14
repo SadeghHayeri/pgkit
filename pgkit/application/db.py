@@ -2,9 +2,9 @@ from tinydb import TinyDB, Query
 from pgkit.application.settings import DB_PATH
 
 
-class DBClass():
+class DBClass:
     def __init__(self, db_path):
-        self.db = TinyDB(db_path)
+        self.db = TinyDB(db_path, create_dirs=True)
         self.config_table = self.db.table('config')
 
     def add_config(self, name, version, host, port, dbname, slot, username, password, replica_port):
