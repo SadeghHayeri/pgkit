@@ -1,6 +1,5 @@
 import click
 from pgkit.application.db import DB
-from pgkit.application.models import Master, Replica
 import pgkit.application.pg as PG
 
 
