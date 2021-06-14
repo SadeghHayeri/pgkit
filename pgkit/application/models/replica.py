@@ -38,16 +38,16 @@ class Replica(Postgres):
         self.start()
 
     def create_cluster(self):
-        execute_sync('pg_createcluster {} {}'.format(self.version, self.name))
+        execute_sync(f'pg_createcluster {self.version} {self.name} -p {self.port}')
 
     def stop(self):
-        execute_sync('pg_ctlcluster {} {} stop'.format(self.version, self.name))
+        execute_sync(f'pg_ctlcluster {self.version} {self.name} stop')
 
     def start(self):
-        execute_sync('pg_ctlcluster {} {} start'.format(self.version, self.name))
+        execute_sync(f'pg_ctlcluster {self.version} {self.name} start')
 
     def restart(self):
-        execute_sync('pg_ctlcluster {} {} restart'.format(self.version, self.name))
+        execute_sync(f'pg_ctlcluster {self.version} {self.name} restart')
 
     def remove_db_directory(self):
         execute_sync(f'rm -rf {self.db_location}')
