@@ -12,7 +12,9 @@ def get_env(env):
     return process_env
 
 
-def execute(cmd, env=[]):
+def execute(cmd, env=None):
+    if env is None:
+        env = []
     print('######', cmd, '######')
     popen = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE, universal_newlines=True, env=get_env(env))
     for stdout_line in iter(popen.stdout.readline, ""):
@@ -23,9 +25,24 @@ def execute(cmd, env=[]):
         raise subprocess.CalledProcessError(return_code, cmd)
 
 
-def execute_sync(cmd, env=[]):
+def execute_sync(cmd, env=None, no_pipe=False):
+    if env is None:
+        env = []
     print('######', cmd, '######')
-    return subprocess.Popen(shlex.split(cmd), env=get_env(env)).communicate()
+    if no_pipe:
+        result = subprocess.Popen(
+            shlex.split(cmd),
+            env=get_env(env),
+        ).communicate()
+    else:
+        result = subprocess.Popen(
+            shlex.split(cmd),
+            env=get_env(env),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        ).communicate()
+    print('*****', result, '*****')
+    return result
 
 
 def read_file(path):
@@ -81,3 +98,10 @@ def to_number(number):
         except ValueError:
             return float(number)
     return number
+
+
+def removesuffix(string: str, suffix: str, /) -> str:
+    if string.endswith(suffix):
+        return string[:-len(suffix)]
+    else:
+        return string[:]

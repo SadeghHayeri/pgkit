@@ -1,8 +1,11 @@
-from pgkit.application.models import Postgres
-from pgkit.application.utils import *
-from jinja2 import Template
+import shutil
 from pathlib import Path
 from time import sleep
+
+from jinja2 import Template
+
+from pgkit.application.models import Postgres
+from pgkit.application.utils import *
 
 
 class Replica(Postgres):
@@ -17,10 +20,13 @@ class Replica(Postgres):
                          slot=None)
         self.master = master
         self.delay = delay
-        self.db_location = '/var/lib/postgresql/{}/{}'.format(self.version, self.name)
-        self.wal_location = '/var/lib/postgresql/wals/{}/{}'.format(self.version, self.name)
+        self.db_location = f'/var/lib/postgresql/{self.version}/{self.name}'
+        self.config_location = f'/etc/postgresql/{self.version}/{self.name}'
+        self.wal_location = f'/var/lib/postgresql/wals/{self.version}/{self.name}'
 
     def start_backup(self):
+        self.stop()
+        self.remove_related_directories()
         self.create_cluster()
         self.stop()
         self.remove_db_directory()
@@ -32,19 +38,30 @@ class Replica(Postgres):
         self.start()
 
     def create_cluster(self):
-        execute_sync('pg_createcluster {} {}'.format(self.version, self.name))
+        execute_sync(f'pg_createcluster {self.version} {self.name} -p {self.port}')
 
     def stop(self):
-        execute_sync('pg_ctlcluster {} {} stop'.format(self.version, self.name))
+        execute_sync(f'pg_ctlcluster {self.version} {self.name} stop')
 
     def start(self):
-        execute_sync('pg_ctlcluster {} {} start'.format(self.version, self.name))
+        execute_sync(f'pg_ctlcluster {self.version} {self.name} start')
 
     def restart(self):
-        execute_sync('pg_ctlcluster {} {} restart'.format(self.version, self.name))
+        execute_sync(f'pg_ctlcluster {self.version} {self.name} restart')
 
     def remove_db_directory(self):
-        execute_sync('rm -rf {}'.format(self.db_location))
+        execute_sync(f'rm -rf {self.db_location}')
+
+    def remove_config_directory(self):
+        execute_sync(f'rm -rf {self.config_location}')
+
+    def remove_existing_wal_files(self):
+        execute_sync(f'rm -rf {self.wal_location}')
+
+    def remove_related_directories(self):
+        self.remove_db_directory()
+        self.remove_config_directory()
+        self.remove_existing_wal_files()
 
     def _stop_old_wal_receive_service(self):
         try:
@@ -94,11 +111,13 @@ class Replica(Postgres):
 
     def recovery(self, target_time):
         self.configure_recovery_file(recovery=True, recovery_target_time=target_time)
+        self._rename_partial_wal_file()
         self.restart()
 
     def configure_recovery_file(self, recovery=False, recovery_target_time=None):
         template_path = Path(__file__).parent / "../templates/{}-recovery.conf".format(self.version)
         template = Template(read_file(template_path))
+        latest = recovery_target_time == 'latest'
 
         print('Create recovery.conf file')
         recovery_config = template.render(
@@ -115,8 +134,9 @@ class Replica(Postgres):
             dbname='postgres',
             standby_mode='true',
             standby_port=self.port,
-            reocvery_mode=recovery,
+            recovery_mode=recovery,
             recovery_target_time=recovery_target_time,
+            latest=latest
         )
 
         file_location = f'/etc/postgresql/{self.version}/{self.name}/postgresql.conf' if self.version >= 12 \
@@ -128,6 +148,67 @@ class Replica(Postgres):
         if self.version >= 12:
             touch_file(f'{self.db_location}/recovery.signal')
             touch_file(f'{self.db_location}/standby.signal')
+
+    def dump(self, database_name, output_path, compress=False, compression_level=9):
+        if compress:
+            execute_sync(
+                f'runuser -l postgres'
+                f' -c \'/usr/lib/postgresql/{self.version}/bin/pg_dump'
+                f' --no-owner'
+                f' -p {self.port}'
+                f' -U postgres'
+                f' -d {database_name}'
+                f' | gzip -{compression_level} > {output_path}\''
+            )
+        else:
+            execute_sync(
+                f'runuser -l postgres'
+                f' -c \'/usr/lib/postgresql/{self.version}/bin/pg_dump'
+                f' -f {output_path}'
+                f' --no-owner'
+                f' -p {self.port}'
+                f' -U postgres'
+                f' -d {database_name}\''
+            )
+
+    def dumpall(self, output_path, compress=False, compression_level=9):
+        if compress:
+            execute_sync(
+                f'runuser -l postgres '
+                f'-c \'/usr/lib/postgresql/{self.version}/bin/pg_dumpall'
+                f' --no-owner'
+                f' -p {self.port}'
+                f' -U postgres'
+                f' | gzip -{compression_level} > {output_path}\''
+            )
+        else:
+            execute_sync(
+                f'runuser -l postgres'
+                f' -c \'/usr/lib/postgresql/{self.version}/bin/pg_dumpall'
+                f' -f {output_path}'
+                f' --no-owner'
+                f' -p {self.port}'
+                f' -U postgres\''
+            )
+
+    def shell(self):
+        execute_sync(f'runuser -l postgres -c \'psql -p {self.port}\'', no_pipe=True)
+
+    def promote(self):
+        execute_sync(
+            f'pg_ctlcluster {self.version} {self.name} promote'
+        )
+
+    def _rename_partial_wal_file(self):
+        wal_location_contents = os.listdir(self.wal_location)
+        for filename in wal_location_contents:
+            if filename.endswith('.partial'):
+                destination_path = os.path.join(self.wal_location, removesuffix(filename, '.partial'))
+                shutil.copy2(
+                    os.path.join(self.wal_location, filename),
+                    destination_path,
+                )
+                chown(destination_path, 'postgres')
 
     def _get_current_delay(self):
         file_location = f'/etc/postgresql/{self.version}/{self.name}/postgresql.conf' if self.version >= 12 \

@@ -1,7 +1,11 @@
-import click
-from pgkit.application.db import DB
-import pgkit.application.pg as PG
 from datetime import datetime, timedelta
+
+import click
+from dateutil.parser import parse as parse_date
+from pytz import timezone
+import pgkit.application.pg as PG
+from pgkit.application.db import DB
+
 
 @click.group()
 def pitr():
@@ -17,15 +21,31 @@ def backup(name, delay):
 
 
 @pitr.command()
-def restore():
-    pass
-
-
-@pitr.command()
 @click.argument('name', required=True)
 def status(name):
     config = DB.get_config(name)
     PG.print_status(**config)
+
+
+@pitr.command()
+@click.argument('name', required=True)
+@click.argument('target_time', required=True)
+def recover(name, target_time):
+    config = DB.get_config(name)
+    if target_time != 'latest':
+        try:
+            parsed_target_date = parse_date(target_time)
+            target_time = str(timezone('Asia/Tehran').localize(parsed_target_date))
+        except ValueError:
+            return click.echo('target_time argument should have a valid datetime format.')
+    PG.recovery(**config, time_to_recover=target_time)
+
+
+@pitr.command()
+@click.argument('name', required=True)
+def promote(name):
+    config = DB.get_config(name)
+    PG.promote(**config)
 
 
 @pitr.command()
@@ -37,5 +57,4 @@ def status(name, delay):
     if click.confirm('Do you want to continue?'):
         time_to_recover = datetime.today() - timedelta(hours=delay)
         config = DB.get_config(name)
-        PG.print_status(**config, time_to_recover)
-
+        PG.print_status(**config)
