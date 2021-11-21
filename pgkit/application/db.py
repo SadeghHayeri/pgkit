@@ -29,5 +29,8 @@ class DBClass:
             raise ValueError(f'No config found by the name {name}')
         return self.config_table.search(Query().name == name)[0]
 
+    def get_configs_list(self):
+        return [item['name'] for item in self.config_table.all()]
+
 
 DB = DBClass(DB_PATH)

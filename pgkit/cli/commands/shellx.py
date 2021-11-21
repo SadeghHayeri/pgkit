@@ -1,3 +1,5 @@
+import yaml
+
 import click
 from pgkit.application.db import DB
 import pgkit.application.pg as PG
@@ -56,3 +58,8 @@ def start(name):
 def restart(name):
     config = DB.get_config(name)
     PG.restart(**config)
+
+
+@click.command()
+def list():
+    return click.echo(yaml.dump(DB.get_configs_list()))
