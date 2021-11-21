@@ -25,3 +25,14 @@ class Postgres:
         env = [('PGPASSWORD', self.password)] if self.password else []
         execute_sync(f'psql -h {self.host} -p {self.port} -U {self.username} -d postgres',
                      env=env, no_pipe=True)
+
+    def create_replication_slot(self):
+        args = {'slot_name': f"'{self.slot}'"}
+        if self.version != 9.5:
+            args['immediately_reserve'] = 'true'
+        pg_command = f'select pg_create_physical_replication_slot({", ".join([f"{k} := {v}" for k, v in args.items()])})'
+        self.run_cmd(pg_command)
+
+    def drop_replication_slot(self):
+        pg_command = f"select pg_drop_replication_slot('{self.slot}')"
+        self.run_cmd(pg_command)

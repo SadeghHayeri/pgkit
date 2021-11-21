@@ -30,6 +30,9 @@ class Replica(Postgres):
         self.create_cluster()
         self.stop()
         self.remove_db_directory()
+        self.stop_wal_receive_service()
+        self.drop_replication_slot()
+        self.create_replication_slot()
         self.setup_wal_receive_service()
         self.master.force_switch_wal()
         sleep(10)  # time to receive first wal segments
@@ -57,6 +60,15 @@ class Replica(Postgres):
 
     def remove_existing_wal_files(self):
         execute_sync(f'rm -rf {self.wal_location}')
+
+    def create_replication_slot(self):
+        self.master.create_replication_slot()
+
+    def drop_replication_slot(self):
+        self.master.drop_replication_slot()
+
+    def stop_wal_receive_service(self):
+        stop_service(f'receivewal-{self.version}-{self.name}')
 
     def remove_related_directories(self):
         self.remove_db_directory()
