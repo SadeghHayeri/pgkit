@@ -131,6 +131,9 @@ class Replica(Postgres):
         template = Template(read_file(template_path))
         latest = recovery_target_time == 'latest'
 
+        max_connections = self.master.get_config_parameter_value('max_connections')
+        max_worker_processes = self.master.get_config_parameter_value('max_worker_processes')
+
         print('Create recovery.conf file')
         recovery_config = template.render(
             name=self.name,
@@ -148,7 +151,9 @@ class Replica(Postgres):
             standby_port=self.port,
             recovery_mode=recovery,
             recovery_target_time=recovery_target_time,
-            latest=latest
+            latest=latest,
+            max_connections=max_connections,
+            max_worker_processes=max_worker_processes,
         )
 
         file_location = f'/etc/postgresql/{self.version}/{self.name}/postgresql.conf' if self.version >= 12 \
