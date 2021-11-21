@@ -1,3 +1,5 @@
+import yaml
+
 import click
 from pgkit.application.db import DB
 from pgkit.application.utils import get_free_port
@@ -31,3 +33,12 @@ def remove(name, dangerous):
     if not dangerous:
         return click.echo('Removal requires --dangerous flag.')
     DB.remove_config(name)
+
+
+@config.command()
+@click.argument('name', required=True)
+def get(name):
+    try:
+        return click.echo(yaml.dump(dict(DB.get_config(name))))
+    except ValueError as e:
+        raise click.BadParameter(message=str(e), param=name, param_hint='NAME')

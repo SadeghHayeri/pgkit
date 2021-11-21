@@ -24,6 +24,9 @@ class DBClass:
         self.config_table.remove(Query().name == name)
 
     def get_config(self, name):
+        results = self.config_table.search(Query().name == name)
+        if not results:
+            raise ValueError(f'No config found by the name {name}')
         return self.config_table.search(Query().name == name)[0]
 
 
