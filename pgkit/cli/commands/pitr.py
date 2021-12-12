@@ -17,14 +17,35 @@ def pitr():
 @click.argument('delay', required=True, type=int)
 def backup(name, delay):
     config = DB.get_config(name)
-    PG.backup(**{**config, 'replica_delay': delay})
+    PG.backup(
+        config['name'],
+        config['host'],
+        config['port'],
+        config['version'],
+        config['dbname'],
+        config['username'],
+        config['password'],
+        config['slot'],
+        config['replica_port'],
+        replica_delay=delay
+    )
 
 
 @pitr.command()
 @click.argument('name', required=True)
 def status(name):
     config = DB.get_config(name)
-    PG.print_status(**config)
+    PG.print_status(
+        config['name'],
+        config['host'],
+        config['port'],
+        config['version'],
+        config['dbname'],
+        config['username'],
+        config['password'],
+        config['slot'],
+        config['replica_port'],
+    )
 
 
 @pitr.command()
@@ -38,14 +59,35 @@ def recover(name, target_time):
             target_time = str(timezone('Asia/Tehran').localize(parsed_target_date))
         except ValueError:
             return click.echo('target_time argument should have a valid datetime format.')
-    PG.recovery(**config, time_to_recover=target_time)
+    PG.recovery(
+        config['name'],
+        config['host'],
+        config['port'],
+        config['version'],
+        config['dbname'],
+        config['username'],
+        config['password'],
+        config['slot'],
+        config['replica_port'],
+        time_to_recover=target_time
+    )
 
 
 @pitr.command()
 @click.argument('name', required=True)
 def promote(name):
     config = DB.get_config(name)
-    PG.promote(**config)
+    PG.promote(
+        config['name'],
+        config['host'],
+        config['port'],
+        config['version'],
+        config['dbname'],
+        config['username'],
+        config['password'],
+        config['slot'],
+        config['replica_port'],
+    )
 
 
 @pitr.command()
@@ -57,4 +99,14 @@ def status(name, delay):
     if click.confirm('Do you want to continue?'):
         time_to_recover = datetime.today() - timedelta(hours=delay)
         config = DB.get_config(name)
-        PG.print_status(**config)
+        PG.print_status(
+            config['name'],
+            config['host'],
+            config['port'],
+            config['version'],
+            config['dbname'],
+            config['username'],
+            config['password'],
+            config['slot'],
+            config['replica_port'],
+        )

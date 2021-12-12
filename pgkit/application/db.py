@@ -1,6 +1,9 @@
 from tinydb import TinyDB, Query
 from pgkit.application.settings import DB_PATH
 
+DEFAULT_MAX_CONNECTIONS = 100
+DEFAULT_MAX_WORKERS = 8
+
 
 class DBClass:
     def __init__(self, db_path):
@@ -17,7 +20,9 @@ class DBClass:
             'slot': slot,
             'username': username,
             'password': password,
-            'replica_port': replica_port
+            'replica_port': replica_port,
+            'max_connections': DEFAULT_MAX_CONNECTIONS,
+            'max_worker_processes': DEFAULT_MAX_WORKERS,
         })
 
     def remove_config(self, name):
@@ -31,6 +36,9 @@ class DBClass:
 
     def get_configs_list(self):
         return [item['name'] for item in self.config_table.all()]
+
+    def update_config(self, name, fields):
+        self.config_table.update(fields, Query().name == name)
 
 
 DB = DBClass(DB_PATH)
