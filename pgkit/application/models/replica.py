@@ -6,6 +6,7 @@ from jinja2 import Template
 
 from pgkit.application.models import Postgres
 from pgkit.application.utils import *
+from pgkit.application.db import DB
 
 
 class Replica(Postgres):
@@ -126,13 +127,24 @@ class Replica(Postgres):
         self._rename_partial_wal_file()
         self.restart()
 
+    def get_config_parameter_value(self, parameter):
+        try:
+            print(f'Getting config parameter {parameter} from master')
+            param_val = self.master.get_config_parameter_value(parameter)
+            DB.update_config(self.name, {parameter: param_val})
+        except Exception as e:
+            print('Error getting master parameter value:', e)
+            print('Using DB value')
+            param_val = DB.get_config(self.name)[parameter]
+        return param_val
+
     def configure_recovery_file(self, recovery=False, recovery_target_time=None):
         template_path = Path(__file__).parent / "../templates/{}-recovery.conf".format(self.version)
         template = Template(read_file(template_path))
         latest = recovery_target_time == 'latest'
 
-        max_connections = self.master.get_config_parameter_value('max_connections')
-        max_worker_processes = self.master.get_config_parameter_value('max_worker_processes')
+        max_connections = self.get_config_parameter_value('max_connections')
+        max_worker_processes = self.get_config_parameter_value('max_worker_processes')
 
         print('Create recovery.conf file')
         recovery_config = template.render(
@@ -215,6 +227,7 @@ class Replica(Postgres):
         execute_sync(
             f'pg_ctlcluster {self.version} {self.name} promote'
         )
+        self.restart()
 
     def _rename_partial_wal_file(self):
         wal_location_contents = os.listdir(self.wal_location)
