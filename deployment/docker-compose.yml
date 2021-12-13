@@ -1,0 +1,27 @@
+version: '3.1'
+
+services:
+
+  master:
+    image: pgkit:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    hostname: master
+    restart: always
+    command: 'bash -c "/init.sh && sleep 3600"'
+    volumes:
+      - ./init.sh:/init.sh:ro
+
+  replica:
+    image: pgkit:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    hostname: replica
+    restart: always
+    command: 'bash -c "/init.sh && exec /lib/systemd/systemd"'
+    privileged: true
+    volumes:
+      - ./init.sh:/init.sh:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
