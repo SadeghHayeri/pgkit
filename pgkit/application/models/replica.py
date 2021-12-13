@@ -117,7 +117,7 @@ class Replica(Postgres):
                   f' -v --checkpoint=fast --progress'
         if self.version >= 10:
             command += ' --wal-method=none'
-        execute_sync(command, env=[('PGPASSWORD', self.master.password)])
+        execute_sync(command, env=[('PGPASSWORD', self.master.password)], no_pipe=True)
 
         print('change owner to postgres')
         chown(self.db_location, 'postgres')
