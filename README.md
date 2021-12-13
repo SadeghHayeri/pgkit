@@ -12,7 +12,7 @@ cd deployment && sudo docker-compose build && sudo docker-compose up -d
 Now exec into replica and run:
 
 ```bash
-pgkit --hlep
+pgkit --help
 ```
 
 ### Standby Replication
