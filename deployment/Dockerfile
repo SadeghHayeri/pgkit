@@ -9,7 +9,8 @@ RUN apt update && apt install -y \
 	python3 \
 	python3-pip \
 	systemd \
-	systemd-sysv
+	systemd-sysv \
+	net-tools
 
 RUN pip3 install pgkit && pip3 install pyyaml
 
