@@ -12,7 +12,7 @@ if [[ $(hostname) == "master" ]]; then
 	echo -e "${GREEN}Creating Sample User and Data${NC}"
 	su - postgres -c bash << EOF
 	psql -c "create database test"
-	psql -c "create role test with login superuser password 'test'"
+	psql -c "create role testuser with login superuser password 'test-pass'"
 	psql -d test -c "CREATE TABLE Persons (ID int NOT NULL, LastName varchar(255) NOT NULL, FirstName varchar(255), Age int, PRIMARY KEY (ID))"
 	psql -d test -c "insert into persons (ID, LastName, FirstName, Age) values (1, 'Doe', 'John', 99)"
 EOF
