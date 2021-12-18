@@ -22,4 +22,4 @@ jobs:
         run: docker-compose -f "deployment/docker-compose.yml" up -d --build
       
       - name: Run tests
-        run: docker-compose -f "deployment/docker-compose.yml" exec replica python3 integration-test.py
+        run: docker-compose -f "deployment/docker-compose.yml" exec -T replica python3 integration-test.py
