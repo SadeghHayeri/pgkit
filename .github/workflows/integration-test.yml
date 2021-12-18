@@ -1,5 +1,16 @@
 name: Test
 
+on:
+  push:
+    paths-ignore:
+      - 'deployment/docker-compose.yml'
+      - 'deployment/Dockerfile'
+      - 'README.md'
+      - 'dist/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.github/workflows/python-publish.yml'
+
 jobs:
   build:
     runs-on: ubuntu-latest
