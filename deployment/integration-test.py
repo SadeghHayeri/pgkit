@@ -65,6 +65,42 @@ def test_pitr_backup():
     assert master_output == replica_output
 
 
+def test_promote_backup():
+    process = (
+        subprocess.Popen(
+            "psql -h replica -p 5432 -d test -U testuser -c \"insert into persons (ID, LastName, FirstName, Age) values (2, 'Eleven', 'Eleven', 15)\"",
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+    )
+    result = process.communicate()
+    assert process.returncode == 1, f"Non one returncode {process.returncode}"
+    assert result[1].decode('utf-8').strip() == "ERROR:  cannot execute INSERT in a read-only transaction", f"Output: {result[1].decode('utf-8')}"
+
+    process = subprocess.Popen("pgkit pitr promote main", shell=True)
+    result = process.communicate()
+    result = tuple(x.decode("utf-8").strip() if x else "" for x in result)
+    assert process.returncode == 0, f"Non zero retuncode for promotion {process.returncode}"
+    assert len(result[0]) == 0, f"Non empty stdout: {result[0]}"
+    assert len(result[1]) == 0, f"Non empty stderr: {result[1]}"
+
+    process = (
+        subprocess.Popen(
+            "psql -h replica -p 5432 -d test -U testuser -c \"insert into persons (ID, LastName, FirstName, Age) values (2, 'Eleven', 'Eleven', 15)\"",
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+    )
+    result = process.communicate()
+    result = tuple(x.decode("utf-8").strip() if x else "" for x in result)
+    assert process.returncode == 0, f"Non zero retuncode for promotion {process.returncode}"
+    assert result[0] == "INSERT 0 1", f"Wrong output: {result[0]}"
+    assert len(result[1]) == 0, f"Non empty stderr: {result[1]}"
+
+
 test_add_config()
 test_get_config()
 test_pitr_backup()
+test_promote_backup()
