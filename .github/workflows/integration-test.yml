@@ -12,7 +12,7 @@ on:
       - '.github/workflows/python-publish.yml'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
