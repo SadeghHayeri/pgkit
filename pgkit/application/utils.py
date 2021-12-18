@@ -41,6 +41,7 @@ def execute_sync(cmd, env=None, no_pipe=False):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         ).communicate()
+    result = tuple(map(lambda x: x.decode('utf-8').strip() if x else "", result))
     print('*****', result, '*****')
     return result
 
