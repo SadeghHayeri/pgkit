@@ -24,8 +24,6 @@ services:
     restart: always
     command: 'bash -c "/init.sh && exec /lib/systemd/systemd"'
     privileged: true
-    depends_on: # for test purpose (IPs in network)
-      - master
     volumes:
       - ./init.sh:/init.sh:ro
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
