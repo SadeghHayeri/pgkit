@@ -42,5 +42,5 @@ class Postgres:
         pg_command = f'SHOW {parameter};'
         result = self.run_cmd(pg_command, without_headers=True)
         if result and result[0]:
-            return result[0].decode().replace('\n', '').replace('\t', '')
+            return result[0].replace('\n', '').replace('\t', '')
         raise Exception('Cannot get parameter')
