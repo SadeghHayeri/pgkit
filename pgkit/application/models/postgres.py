@@ -12,11 +12,11 @@ class Postgres:
         self.password = password
         self.slot = slot
 
-    def run_cmd(self, cmd, without_headers=False):
+    def run_cmd(self, cmd, without_headers=False, timeout=None):
         env = [('PGPASSWORD', self.password)] if self.password else []
         return execute_sync(f'psql -h {self.host} -p {self.port} -U {self.username} -d {self.dbname} -c "{cmd}"'
                             f' {"-t" if without_headers else ""}',
-                            env=env)
+                            env=env, timeout=timeout)
 
     def force_switch_wal(self):
         pg_command = 'select * from pg_switch_xlog()' if self.version < 10 else 'select * from pg_switch_wal()'
@@ -40,7 +40,7 @@ class Postgres:
 
     def get_config_parameter_value(self, parameter):
         pg_command = f'SHOW {parameter};'
-        result = self.run_cmd(pg_command, without_headers=True)
+        result = self.run_cmd(pg_command, without_headers=True, timeout=10)
         if result and result[0]:
             return result[0].replace('\n', '').replace('\t', '')
         raise Exception('Cannot get parameter')

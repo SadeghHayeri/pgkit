@@ -25,7 +25,7 @@ def execute(cmd, env=None):
         raise subprocess.CalledProcessError(return_code, cmd)
 
 
-def execute_sync(cmd, env=None, no_pipe=False):
+def execute_sync(cmd, env=None, no_pipe=False, timeout=None):
     if env is None:
         env = []
     print('######', cmd, '######')
@@ -33,14 +33,14 @@ def execute_sync(cmd, env=None, no_pipe=False):
         result = subprocess.Popen(
             shlex.split(cmd),
             env=get_env(env),
-        ).communicate()
+        ).communicate(timeout=timeout)
     else:
         result = subprocess.Popen(
             shlex.split(cmd),
             env=get_env(env),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
-        ).communicate()
+        ).communicate(timeout=timeout)
     result = tuple(map(lambda x: x.decode('utf-8').strip() if x else "", result))
     print('*****', result, '*****')
     return result

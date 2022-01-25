@@ -1,8 +1,12 @@
 [tool.poetry]
 name = "pgkit"
-version = "2.1.5"
+version = "2.1.6"
 description = ""
-authors = ["Sadegh Hayeri <hayerisadegh@gmail.com>", "Nima Modares Gorji <nima.mg@gmail.com>", "Javad Alipanah <javadalipanah@gmail.com>", "Parsa Ghorbani <parsa_ghorbani@outlook.com>"]
+authors = [
+  "Sadegh Hayeri <hayerisadegh@gmail.com>",
+  "Nima Modares Gorji <nima.mg@gmail.com>",
+  "Javad Alipanah <javadalipanah@gmail.com>",
+  "Parsa Ghorbani <parsa_ghorbani@outlook.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
