@@ -19,7 +19,7 @@ def config():
 @click.option('--slot', help='Slot Name', required=True, prompt=True)
 @click.option('--username', help='Username', required=True, prompt=True)
 @click.option('--password', help='Password', required=True, prompt=True, hide_input=True)
-@click.option('--replica-port', help='Replica Port', required=False, prompt=True)
+@click.option('--replica-port', help='Replica Port', required=False, prompt=False)
 def add(name, version, host, port, dbname, slot, username, password, replica_port):
     if not replica_port:
         replica_port = get_free_port()
