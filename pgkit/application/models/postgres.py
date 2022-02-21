@@ -12,11 +12,11 @@ class Postgres:
         self.password = password
         self.slot = slot
 
-    def run_cmd(self, cmd, without_headers=False, timeout=None):
+    def run_cmd(self, cmd, without_headers=False, timeout=None, check_returncode=False):
         env = [('PGPASSWORD', self.password)] if self.password else []
         return execute_sync(f'psql -h {self.host} -p {self.port} -U {self.username} -d {self.dbname} -c "{cmd}"'
                             f' {"-t" if without_headers else ""}',
-                            env=env, timeout=timeout)
+                            env=env, timeout=timeout, check_returncode=check_returncode)
 
     def force_switch_wal(self):
         pg_command = 'select * from pg_switch_xlog()' if self.version < 10 else 'select * from pg_switch_wal()'
@@ -32,7 +32,7 @@ class Postgres:
         if self.version != 9.5:
             args['immediately_reserve'] = 'true'
         pg_command = f'select pg_create_physical_replication_slot({", ".join([f"{k} := {v}" for k, v in args.items()])})'
-        self.run_cmd(pg_command)
+        self.run_cmd(pg_command, check_returncode=True)
 
     def drop_replication_slot(self):
         pg_command = f"select pg_drop_replication_slot('{self.slot}')"

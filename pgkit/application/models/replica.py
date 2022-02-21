@@ -42,13 +42,13 @@ class Replica(Postgres):
         self.start()
 
     def create_cluster(self):
-        execute_sync(f'pg_createcluster {self.version} {self.name} -p {self.port}')
+        execute_sync(f'pg_createcluster {self.version} {self.name} -p {self.port}', check_returncode=True)
 
     def stop(self):
         execute_sync(f'pg_ctlcluster {self.version} {self.name} stop')
 
     def start(self):
-        execute_sync(f'pg_ctlcluster {self.version} {self.name} start')
+        execute_sync(f'pg_ctlcluster {self.version} {self.name} start', check_returncode=True)
 
     def restart(self):
         execute_sync(f'pg_ctlcluster {self.version} {self.name} restart')
@@ -117,7 +117,7 @@ class Replica(Postgres):
                   f' -v --checkpoint=fast --progress'
         if self.version >= 10:
             command += ' --wal-method=none'
-        execute_sync(command, env=[('PGPASSWORD', self.master.password)], no_pipe=True)
+        execute_sync(command, env=[('PGPASSWORD', self.master.password)], no_pipe=True, check_returncode=True)
 
         print('change owner to postgres')
         chown(self.db_location, 'postgres')

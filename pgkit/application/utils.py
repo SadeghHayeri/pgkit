@@ -25,24 +25,28 @@ def execute(cmd, env=None):
         raise subprocess.CalledProcessError(return_code, cmd)
 
 
-def execute_sync(cmd, env=None, no_pipe=False, timeout=None):
+def execute_sync(cmd, env=None, no_pipe=False, timeout=None, check_returncode=False):
     if env is None:
         env = []
     print('######', cmd, '######')
     if no_pipe:
-        result = subprocess.Popen(
+        child = subprocess.Popen(
             shlex.split(cmd),
             env=get_env(env),
-        ).communicate(timeout=timeout)
+        )
     else:
-        result = subprocess.Popen(
+        child = subprocess.Popen(
             shlex.split(cmd),
             env=get_env(env),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
-        ).communicate(timeout=timeout)
+        )
+    result = child.communicate(timeout=timeout)
     result = tuple(map(lambda x: x.decode('utf-8').strip() if x else "", result))
+    if check_returncode and child.returncode != 0:
+        raise subprocess.CalledProcessError(child.returncode, cmd)
     print('*****', result, '*****')
+
     return result
 
 
