@@ -1,9 +1,10 @@
 from pgkit.application.models import Master, Replica
 
 
-def backup(name, host, port, version, dbname, username, password, slot, replica_port, replica_delay):
+def backup(name, host, port, version, dbname, username,
+           password, slot, replica_port, use_separate_receivewal_service, replica_delay):
     master = Master(name, host, port, version, dbname, username, password, slot)
-    replica = Replica(master, replica_port, replica_delay)
+    replica = Replica(master, replica_port, replica_delay, use_separate_receivewal_service)
 
     replica.start_backup()
 

@@ -96,6 +96,10 @@ def touch_file(path, owner='postgres'):
     execute_sync(f'chown -R {owner}:{owner} {path}')
 
 
+def remove_file(path):
+    execute_sync(f'rm -f {path}')
+
+
 def to_number(number):
     if type(number) == str:
         try:

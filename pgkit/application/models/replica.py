@@ -10,7 +10,7 @@ from pgkit.application.db import DB
 
 
 class Replica(Postgres):
-    def __init__(self, master, port, delay):
+    def __init__(self, master, port, delay, use_separate_receivewal_service=False):
         super().__init__(name=master.name,
                          host='localhost',
                          port=port,
@@ -24,6 +24,7 @@ class Replica(Postgres):
         self.db_location = f'/var/lib/postgresql/{self.version}/{self.name}'
         self.config_location = f'/etc/postgresql/{self.version}/{self.name}'
         self.wal_location = f'/var/lib/postgresql/wals/{self.version}/{self.name}'
+        self.use_separate_receivewal_service = use_separate_receivewal_service
 
     def start_backup(self):
         self.stop()
@@ -34,7 +35,8 @@ class Replica(Postgres):
         self.stop_wal_receive_service()
         self.drop_replication_slot()
         self.create_replication_slot()
-        self.setup_wal_receive_service()
+        if self.use_separate_receivewal_service:
+            self.setup_wal_receive_service()
         self.master.force_switch_wal()
         sleep(10)  # time to receive first wal segments
         self.create_base_backup()
@@ -115,7 +117,7 @@ class Replica(Postgres):
                   f' -D {self.db_location}' \
                   f' -U {self.master.username}' \
                   f' -v --checkpoint=fast --progress'
-        if self.version >= 10:
+        if self.version >= 10 and self.use_separate_receivewal_service:
             command += ' --wal-method=none'
         execute_sync(command, env=[('PGPASSWORD', self.master.password)], no_pipe=True, check_returncode=True)
 
@@ -166,6 +168,7 @@ class Replica(Postgres):
             latest=latest,
             max_connections=max_connections,
             max_worker_processes=max_worker_processes,
+            use_separate_receivewal_service=self.use_separate_receivewal_service
         )
 
         file_location = f'/etc/postgresql/{self.version}/{self.name}/postgresql.conf' if self.version >= 12 \
@@ -227,6 +230,7 @@ class Replica(Postgres):
         execute_sync(
             f'pg_ctlcluster {self.version} {self.name} promote'
         )
+        remove_file(f'/var/lib/postgresql/{self.version}/{self.name}/recovery.signal')
         self.restart()
 
     def _rename_partial_wal_file(self):

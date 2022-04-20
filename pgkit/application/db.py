@@ -10,7 +10,7 @@ class DBClass:
         self.db = TinyDB(db_path, create_dirs=True)
         self.config_table = self.db.table('config')
 
-    def add_config(self, name, version, host, port, dbname, slot, username, password, replica_port):
+    def add_config(self, name, version, host, port, dbname, slot, username, password, replica_port, use_separate_receivewal_service):
         self.config_table.insert({
             'name': name,
             'version': version,
@@ -21,6 +21,7 @@ class DBClass:
             'username': username,
             'password': password,
             'replica_port': replica_port,
+            'use_separate_receivewal_service': use_separate_receivewal_service,
             'max_connections': DEFAULT_MAX_CONNECTIONS,
             'max_worker_processes': DEFAULT_MAX_WORKERS,
         })
