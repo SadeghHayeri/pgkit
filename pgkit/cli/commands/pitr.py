@@ -27,7 +27,7 @@ def backup(name, delay):
         config['password'],
         config['slot'],
         config['replica_port'],
-        config['use_separate_receivewal_service'],
+        config.get('use_separate_receivewal_service', False),
         replica_delay=delay
     )
 
