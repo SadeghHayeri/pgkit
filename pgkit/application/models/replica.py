@@ -117,8 +117,11 @@ class Replica(Postgres):
                   f' -D {self.db_location}' \
                   f' -U {self.master.username}' \
                   f' -v --checkpoint=fast --progress'
-        if self.version >= 10 and self.use_separate_receivewal_service:
-            command += ' --wal-method=none'
+        if self.version >= 10:
+            if self.use_separate_receivewal_service:
+                command += ' --wal-method=none'
+            else:
+                command += ' --wal-method=stream --slot={}'.format(self.master.slot)
         execute_sync(command, env=[('PGPASSWORD', self.master.password)], no_pipe=True, check_returncode=True)
 
         print('change owner to postgres')
