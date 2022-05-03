@@ -117,6 +117,8 @@ class Replica(Postgres):
                   f' -D {self.db_location}' \
                   f' -U {self.master.username}' \
                   f' -v --checkpoint=fast --progress'
+        if self.version == 9.5 and not self.use_separate_receivewal_service:
+            command += ' --xlog-method=stream'
         if self.version >= 10:
             if self.use_separate_receivewal_service:
                 command += ' --wal-method=none'
