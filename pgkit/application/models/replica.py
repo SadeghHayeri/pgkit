@@ -125,7 +125,8 @@ class Replica(Postgres):
             else:
                 command += ' --wal-method=stream --slot={}'.format(self.master.slot)
         execute_sync(command, env=[('PGPASSWORD', self.master.password)], no_pipe=True, check_returncode=True)
-
+        if os.path.exists(f'{self.db_location}/recovery.done'):
+            os.remove(f'{self.db_location}/recovery.done')
         print('change owner to postgres')
         chown(self.db_location, 'postgres')
 
