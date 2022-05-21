@@ -91,23 +91,23 @@ def promote(name):
     )
 
 
-@pitr.command()
-@click.argument('name', required=True)
-@click.argument('delay', required=True, type=float)
-def status(name, delay):
-    target_time = (datetime.today() - timedelta(hours=4.5)).strftime('%Y-%m-%d %H:%M:%S GMT')
-    print(f'TARGET TIME: {target_time}')
-    if click.confirm('Do you want to continue?'):
-        time_to_recover = datetime.today() - timedelta(hours=delay)
-        config = DB.get_config(name)
-        PG.print_status(
-            config['name'],
-            config['host'],
-            config['port'],
-            config['version'],
-            config['dbname'],
-            config['username'],
-            config['password'],
-            config['slot'],
-            config['replica_port'],
-        )
+# @pitr.command()
+# @click.argument('name', required=True)
+# @click.argument('delay', required=True, type=float)
+# def status(name, delay):
+#     target_time = (datetime.today() - timedelta(hours=4.5)).strftime('%Y-%m-%d %H:%M:%S GMT')
+#     print(f'TARGET TIME: {target_time}')
+#     if click.confirm('Do you want to continue?'):
+#         time_to_recover = datetime.today() - timedelta(hours=delay)
+#         config = DB.get_config(name)
+#         PG.print_status(
+#             config['name'],
+#             config['host'],
+#             config['port'],
+#             config['version'],
+#             config['dbname'],
+#             config['username'],
+#             config['password'],
+#             config['slot'],
+#             config['replica_port'],
+#         )
