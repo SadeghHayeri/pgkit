@@ -2,7 +2,7 @@
 Postgresql KIT - Backup, PITR and recovery managment make easy
 
 <p align="center">
-    <img src="assets/header-yellow.png" alt="pgkit logo" width="600">
+    <img src="assets/header-yellow.png" alt="pgkit logo" width="100%">
 </p>
 <p align="center">
     <img src="https://img.shields.io/github/license/SadeghHayeri/pgkit.svg?color=green&style=for-the-badge"> <img src="https://img.shields.io/github/repo-size/SadeghHayeri/pgkit.svg?color=green&style=for-the-badge">
