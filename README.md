@@ -8,7 +8,7 @@ Postgresql KIT - Backup, PITR and recovery management made easy
     <img src="https://img.shields.io/github/license/SadeghHayeri/pgkit.svg?color=green&style=for-the-badge"> <img src="https://img.shields.io/github/repo-size/SadeghHayeri/pgkit.svg?color=green&style=for-the-badge">
 </p>
 
-PgKit is an open-source administration tool for disaster recovery of PostgreSQL servers, It allows your organisation to perform remote backups of multiple servers in business critical environments to reduce risk and help DBAs during the recovery phase.
+PgKit is an open-source administration tool for disaster recovery of PostgreSQL servers, It allows your organization to perform remote backups of multiple servers in business-critical environments to reduce risk and help DBAs during the recovery phase.
 
 ### demo
 <a href="https://asciinema.org/a/496249?speed=3&theme=tango&autoplay=1" target="_blank"><img src="https://asciinema.org/a/496249.svg" /></a>
@@ -66,7 +66,7 @@ The `use-separate-wal-receive-service` flag specifies if pgkit should use a sepa
 from the host or to let the postgres cluster handle receiving the WAL files itself.
 
 > **Important:** It's best to use a separate receivewal service (set the flag) if setting up a delayed replica (PITR). If setting
-> up a real-time replica (zero delay) it is better to let PostgreSQL receive the WAL files itself.
+> up a real-time replica (zero delays) it is better to let PostgreSQL receive the WAL files itself.
 
 #### Adding a database config using the interactive prompt:
 ```shell
