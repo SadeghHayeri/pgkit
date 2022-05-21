@@ -1,4 +1,11 @@
 # pgkit
+<p align="center">
+    <img src="assets/header.png" alt="pgkit logo" width="600">
+</p>
+<p align="center">
+    <img src="https://img.shields.io/github/license/SadeghHayeri/pgkit.svg?color=Green&style=for-the-badge"> <img src="https://img.shields.io/github/repo-size/SadeghHayeri/pgkit.svg?color=Green&style=for-the-badge">
+</p>
+
 Postgresql KIT (Backup, PITR (Point-in-Time-Recovery), and recovery)
 
 ## Installation
