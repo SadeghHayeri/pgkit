@@ -1,5 +1,5 @@
 # PgKit
-Postgresql KIT - Backup, PITR and recovery managment made easy
+Postgresql KIT - Backup, PITR and recovery management made easy
 
 <p align="center">
     <img src="assets/header-blue.png" alt="pgkit logo" width="100%">
