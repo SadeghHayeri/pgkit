@@ -2,10 +2,10 @@
 Postgresql KIT - Backup, PITR and recovery managment make easy
 
 <p align="center">
-    <img src="assets/header.png" alt="pgkit logo" width="600">
+    <img src="assets/header-yellow.png" alt="pgkit logo" width="600">
 </p>
 <p align="center">
-    <img src="https://img.shields.io/github/license/SadeghHayeri/pgkit.svg?color=red&style=for-the-badge"> <img src="https://img.shields.io/github/repo-size/SadeghHayeri/pgkit.svg?color=red&style=for-the-badge">
+    <img src="https://img.shields.io/github/license/SadeghHayeri/pgkit.svg?color=green&style=for-the-badge"> <img src="https://img.shields.io/github/repo-size/SadeghHayeri/pgkit.svg?color=green&style=for-the-badge">
 </p>
 
 PgKit is an open-source administration tool for disaster recovery of PostgreSQL servers, It allows your organisation to perform remote backups of multiple servers in business critical environments to reduce risk and help DBAs during the recovery phase.
