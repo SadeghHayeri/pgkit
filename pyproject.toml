@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pgkit"
-version = "2.2.4"
+version = "2.2.5"
 description = ""
 authors = [
   "Sadegh Hayeri <hayerisadegh@gmail.com>",
