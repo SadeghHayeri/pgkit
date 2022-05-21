@@ -1,6 +1,16 @@
-# pgkit
-Postgresql KIT (Backup, PITR (Point-in-Time-Recovery), and recovery)
+# PgKit
+Postgresql KIT - Backup, PITR and recovery managment made easy
 
+<p align="center">
+    <img src="assets/header-yellow.png" alt="pgkit logo" width="100%">
+</p>
+<p align="center">
+    <img src="https://img.shields.io/github/license/SadeghHayeri/pgkit.svg?color=green&style=for-the-badge"> <img src="https://img.shields.io/github/repo-size/SadeghHayeri/pgkit.svg?color=green&style=for-the-badge">
+</p>
+
+PgKit is an open-source administration tool for disaster recovery of PostgreSQL servers, It allows your organisation to perform remote backups of multiple servers in business critical environments to reduce risk and help DBAs during the recovery phase.
+
+---
 ## Installation
 [pgkit](https://pypi.org/project/pgkit/) can be installed through pip.
 
@@ -9,6 +19,7 @@ As the package works with postgresql, it should be installed as root to have eno
 $ sudo pip3 install pgkit
 ```
 
+---
 ## Usage
 
 pgkit provides a cli with these commands available:
@@ -187,7 +198,7 @@ This command restarts the replica PostgreSQL cluster.
 ```shell
 $ sudo pgkit restarts <name>
 ```
-
+---
 ## To-Do
 - [ ] Add `replica-port` and `use-separate-wal-receive-service` options to the interactive prompt.
 - [ ] Fix the tests.
