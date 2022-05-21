@@ -10,6 +10,9 @@ Postgresql KIT - Backup, PITR and recovery managment made easy
 
 PgKit is an open-source administration tool for disaster recovery of PostgreSQL servers, It allows your organisation to perform remote backups of multiple servers in business critical environments to reduce risk and help DBAs during the recovery phase.
 
+### demo
+<a href="https://asciinema.org/a/496249?speed=3&theme=tango&autoplay=1" target="_blank"><img src="https://asciinema.org/a/496249.svg" /></a>
+
 ---
 ## Installation
 [pgkit](https://pypi.org/project/pgkit/) can be installed through pip.
