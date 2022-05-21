@@ -34,7 +34,7 @@ def recovery(name, host, port, version, dbname, username, password, slot, replic
 
 
 def dump(name, host, port, version, dbname, username, password, slot, replica_port, output_path, database_name,
-         compress=False, compression_level=9):
+         compress=False, compression_level=6):
     master = Master(name, host, port, version, dbname, username, password, slot)
     replica = Replica(master, replica_port, None)
 

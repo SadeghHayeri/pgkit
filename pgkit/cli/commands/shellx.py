@@ -29,7 +29,7 @@ def shell(name, replica):
 @click.argument('database_name', required=True)
 @click.argument('output_path', required=True)
 @click.option('--compress', required=False, is_flag=True)
-@click.option('--compression-level', required=False, type=click.Choice(list(map(str, range(1, 10)))))
+@click.option('--compression-level', required=False, default='6', type=click.Choice(list(map(str, range(1, 10)))),)
 def dump(name, database_name, output_path, compress, compression_level):
     if not compress and compression_level:
         return click.echo('--compress flag should be given when compression level is specified')
