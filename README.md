@@ -205,7 +205,7 @@ $ sudo pgkit restarts <name>
 ## To-Do
 - [ ] Add `replica-port` and `use-separate-wal-receive-service` options to the interactive prompt.
 - [ ] Fix the tests.
-- [ ] Add `edit` command to the `config` part.
+- [x] Add `edit` command to the `config` part.
 - [ ] Add `status` command to pgkit to show stats about the databases.
 
 ## Test Environment
