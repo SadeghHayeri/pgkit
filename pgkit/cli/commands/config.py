@@ -4,13 +4,20 @@ import click
 from pgkit.application.db import DB
 from pgkit.application.utils import get_free_port
 
+
 @click.group()
 def config():
     pass
 
 
+def validate_new_name(ctx, param, value):
+    if value in DB.get_configs_list():
+        raise click.BadParameter(f'Config with name {value} already exists')
+    return value
+
+
 @config.command()
-@click.option('--name', help='Postgres Name', required=True, prompt=True)
+@click.option('--name', help='Postgres Name', callback=validate_new_name, required=True, prompt=True)
 @click.option('--version', help='Postgres Version', required=True, prompt=True,
               type=click.Choice(['9.5', '10', '11', '12', '13'], case_sensitive=False))
 @click.option('--host', help='Host IP', required=True, prompt=True)
@@ -29,7 +36,7 @@ def add(**kwargs):
 
 @config.command()
 @click.argument('name', required=True)
-@click.option('--new_name', help='Postgres New name', required=False, prompt=False)
+@click.option('--new_name', help='Postgres New name', callback=validate_new_name, required=False, prompt=False)
 @click.option('--version', help='Postgres Version', required=False, prompt=False,
               type=click.Choice(['9.5', '10', '11', '12', '13'], case_sensitive=False))
 @click.option('--host', help='Host IP', required=False, prompt=False)
