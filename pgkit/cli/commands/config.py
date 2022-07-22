@@ -21,10 +21,10 @@ def config():
 @click.option('--password', help='Password', required=True, prompt=True, hide_input=True)
 @click.option('--replica-port', help='Replica Port', required=False, prompt=False)
 @click.option('--use-separate-receivewal-service', help='Use Separate Receivewal Service', required=False, is_flag=True)
-def add(name, version, host, port, dbname, slot, username, password, replica_port, use_separate_receivewal_service):
-    if not replica_port:
-        replica_port = get_free_port()
-    DB.add_config(name, version, host, port, dbname, slot, username, password, replica_port, use_separate_receivewal_service)
+def add(**kwargs):
+    if not kwargs['replica_port']:
+        kwargs['replica_port'] = get_free_port()
+    DB.add_config(**kwargs)
 
 
 @config.command()
