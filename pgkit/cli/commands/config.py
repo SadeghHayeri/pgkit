@@ -10,14 +10,8 @@ def config():
     pass
 
 
-def validate_new_name(ctx, param, value):
-    if value in DB.get_configs_list():
-        raise click.BadParameter(f'Config with name {value} already exists')
-    return value
-
-
 @config.command()
-@click.option('--name', help='Postgres Name', callback=validate_new_name, required=True, prompt=True)
+@click.option('--name', help='Postgres Name', required=True, prompt=True)
 @click.option('--version', help='Postgres Version', required=True, prompt=True,
               type=click.Choice(['9.5', '10', '11', '12', '13'], case_sensitive=False))
 @click.option('--host', help='Host IP', required=True, prompt=True)
@@ -28,15 +22,15 @@ def validate_new_name(ctx, param, value):
 @click.option('--password', help='Password', required=True, prompt=True, hide_input=True)
 @click.option('--replica-port', help='Replica Port', required=False, prompt=False)
 @click.option('--use-separate-receivewal-service', help='Use Separate Receivewal Service', required=False, is_flag=True)
-def add(**kwargs):
-    if not kwargs['replica_port']:
-        kwargs['replica_port'] = get_free_port()
-    DB.add_config(**kwargs)
+def add(name, version, host, port, dbname, slot, username, password, replica_port, use_separate_receivewal_service):
+    if not replica_port:
+        replica_port = get_free_port()
+    DB.add_config(name, version, host, port, dbname, slot, username, password, replica_port, use_separate_receivewal_service)
 
 
 @config.command()
 @click.argument('name', required=True)
-@click.option('--new_name', help='Postgres New name', callback=validate_new_name, required=False, prompt=False)
+@click.option('--new_name', help='Postgres New name', required=False, prompt=False)
 @click.option('--version', help='Postgres Version', required=False, prompt=False,
               type=click.Choice(['9.5', '10', '11', '12', '13'], case_sensitive=False))
 @click.option('--host', help='Host IP', required=False, prompt=False)
