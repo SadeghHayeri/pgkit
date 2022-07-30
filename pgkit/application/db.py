@@ -1,13 +1,23 @@
-from tinydb import TinyDB, Query
+import os
+
+from tinydb import TinyDB, Query, JSONStorage
+
 from pgkit.application.settings import DB_PATH
 
 DEFAULT_MAX_CONNECTIONS = 100
 DEFAULT_MAX_WORKERS = 8
 
 
+class LimitedPermissionJSONStorage(JSONStorage):
+
+    def __init__(self, path: str, permission: int, **kwargs):
+        super().__init__(path=path, **kwargs)
+        os.chmod(path, permission)
+
+
 class DBClass:
     def __init__(self, db_path):
-        self.db = TinyDB(db_path, create_dirs=True)
+        self.db = TinyDB(path=db_path, create_dirs=True, permission=0o600, storage=LimitedPermissionJSONStorage)
         self.config_table = self.db.table('config')
 
     def add_config(self, name, version, host, port, dbname, slot, username, password, replica_port, use_separate_receivewal_service):
