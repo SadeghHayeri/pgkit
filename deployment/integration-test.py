@@ -8,7 +8,7 @@ from pgkit.application.models import master, replica
 from pgkit.application.settings import DB_PATH
 
 
-EXPECTED_CONFIG = '{"config": {"1": {"name": "main", "version": "12", "host": "master", "port": 5432, "dbname": "test", "slot": "replicaslottest", "username": "testuser", "password": "test-pass", "replica_port": "5432", "max_connections": 100, "max_worker_processes": 8}}}'
+EXPECTED_CONFIG = '{"config": {"1": {"name": "main", "version": "12", "host": "master", "port": 5432, "dbname": "test", "slot": "replicaslottest", "username": "testuser", "password": "test-pass", "replica_port": "5432", "use_separate_receivewal_service": false, "max_connections": 100, "max_worker_processes": 8}}}'
 
 pgpass_file = str(pathlib.Path.home()) + '/.pgpass'
 with open(pgpass_file, 'w+') as f:
@@ -82,7 +82,7 @@ def add_config(cluster_name, master_host, replica_slot, replica_port):
 
 
 def test_add_config():
-    add_config("main" , "master", "replicaslottest", 5432)
+    add_config("main", "master", "replicaslottest", 5432)
 
     with open(DB_PATH, 'r') as f:
         lines = f.readlines()
@@ -101,8 +101,9 @@ def test_get_config():
     assert output[6] == "port: 5432"
     assert output[7] == "replica_port: '5432'"
     assert output[8] == "slot: replicaslottest"
-    assert output[9] == "username: testuser"
-    assert output[10] == "version: '12'"
+    assert output[9] == "use_separate_receivewal_service: false"
+    assert output[10] == "username: testuser"
+    assert output[11] == "version: '12'"
 
 
 def test_pitr_0_delay_backup():

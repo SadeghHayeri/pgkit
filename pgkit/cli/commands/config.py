@@ -4,6 +4,7 @@ import click
 from pgkit.application.db import DB
 from pgkit.application.utils import get_free_port
 
+
 @click.group()
 def config():
     pass
@@ -25,6 +26,27 @@ def add(name, version, host, port, dbname, slot, username, password, replica_por
     if not replica_port:
         replica_port = get_free_port()
     DB.add_config(name, version, host, port, dbname, slot, username, password, replica_port, use_separate_receivewal_service)
+
+
+@config.command()
+@click.argument('name', required=True)
+@click.option('--new_name', help='Postgres New name', required=False, prompt=False)
+@click.option('--version', help='Postgres Version', required=False, prompt=False,
+              type=click.Choice(['9.5', '10', '11', '12', '13'], case_sensitive=False))
+@click.option('--host', help='Host IP', required=False, prompt=False)
+@click.option('--port', help='Port Number', required=False, prompt=False, type=int)
+@click.option('--dbname', help='Database Name', required=False, prompt=False)
+@click.option('--slot', help='Slot Name', required=False, prompt=False)
+@click.option('--username', help='Username', required=False, prompt=False)
+@click.option('--password', help='Password', required=False, prompt=False, hide_input=True)
+@click.option('--replica-port', help='Replica Port', required=False, prompt=False)
+@click.option('--use-separate-receivewal-service', help='Use Separate Receivewal Service', required=False,
+              is_flag=True, default=None)
+def edit(name, **kwargs):
+    kwargs['name'] = kwargs['new_name'] if kwargs['new_name'] else name
+    del kwargs['new_name']
+    fields = {k: v for k, v in kwargs.items() if v is not None}
+    DB.update_config(name, fields)
 
 
 @config.command()
