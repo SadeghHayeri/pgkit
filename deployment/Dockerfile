@@ -4,7 +4,9 @@ ENV container docker
 ENV LC_ALL C
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - && apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install wget
+
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && apt-get update && apt-get install -y \
 	postgresql-12 \
 	python3 \
 	python3-pip \
