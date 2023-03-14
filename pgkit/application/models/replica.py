@@ -50,10 +50,16 @@ class Replica(Postgres):
         execute_sync(f'pg_ctlcluster {self.version} {self.name} stop')
 
     def start(self):
-        execute_sync(f'pg_ctlcluster {self.version} {self.name} start', check_returncode=True)
+        if self.version >= 14: 
+            execute_sync(f'sudo -u postgres pg_ctlcluster {self.version} {self.name} start', check_returncode=True)
+        else: 
+            execute_sync(f'pg_ctlcluster {self.version} {self.name} start', check_returncode=True)
 
     def restart(self):
-        execute_sync(f'pg_ctlcluster {self.version} {self.name} restart')
+        if self.version >= 14: 
+            execute_sync(f'sudo -u postgres pg_ctlcluster {self.version} {self.name} restart')
+        else: 
+            execute_sync(f'pg_ctlcluster {self.version} {self.name} restart')
 
     def remove_db_directory(self):
         execute_sync(f'rm -rf {self.db_location}')
@@ -240,7 +246,7 @@ class Replica(Postgres):
         self.restart()
 
     def _rename_partial_wal_file(self):
-        wal_location_contents = os.listdir(self.wal_location)
+        wal_location_contents = os.listdir(self.wal_location) if os.path.isdir(self.wal_location) else []
         for filename in wal_location_contents:
             if filename.endswith('.partial'):
                 destination_path = os.path.join(self.wal_location, removesuffix(filename, '.partial'))
@@ -257,7 +263,8 @@ class Replica(Postgres):
         config = read_file(file_location)
         for line in config.split('\n'):
             if 'recovery_min_apply_delay' in line:
-                return int(line.split(' ')[2].split("min")[0]) / 60
+                time = line.split(' ')[2].split("min")[0]
+                return int(0 if time=="''" else int(time[0])) / 60
 
     def _get_replication_slot_status(self):
         return self.master.run_cmd('select active from pg_replication_slots')
