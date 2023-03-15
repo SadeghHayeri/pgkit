@@ -50,16 +50,10 @@ class Replica(Postgres):
         execute_sync(f'pg_ctlcluster {self.version} {self.name} stop')
 
     def start(self):
-        if self.version >= 14: 
-            execute_sync(f'sudo -u postgres pg_ctlcluster {self.version} {self.name} start', check_returncode=True)
-        else: 
-            execute_sync(f'pg_ctlcluster {self.version} {self.name} start', check_returncode=True)
+        execute_sync(f'pg_ctlcluster {self.version} {self.name} start', check_returncode=True)
 
     def restart(self):
-        if self.version >= 14: 
-            execute_sync(f'sudo -u postgres pg_ctlcluster {self.version} {self.name} restart')
-        else: 
-            execute_sync(f'pg_ctlcluster {self.version} {self.name} restart')
+        execute_sync(f'pg_ctlcluster {self.version} {self.name} restart')
 
     def remove_db_directory(self):
         execute_sync(f'rm -rf {self.db_location}')
@@ -263,8 +257,8 @@ class Replica(Postgres):
         config = read_file(file_location)
         for line in config.split('\n'):
             if 'recovery_min_apply_delay' in line:
-                time = line.split(' ')[2].split("min")[0]
-                return int(0 if time=="''" else int(time[0])) / 60
+                time_difference = line.split(' ')[2].split("min")[0]
+                return int(0 if time_difference=="''" else int(time_difference)) / 60
 
     def _get_replication_slot_status(self):
         return self.master.run_cmd('select active from pg_replication_slots')
