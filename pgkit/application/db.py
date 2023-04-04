@@ -16,9 +16,18 @@ class LimitedPermissionJSONStorage(JSONStorage):
 
 
 class DBClass:
+    DEFAULT_PERMISSION = 0o600
+
     def __init__(self, db_path):
-        self.db = TinyDB(path=db_path, create_dirs=True, permission=0o600, storage=LimitedPermissionJSONStorage)
+
+        self.db = TinyDB(path=db_path,
+                         create_dirs=True,
+                         permission=self.DEFAULT_PERMISSION,
+                         storage=LimitedPermissionJSONStorage)
         self.config_table = self.db.table('config')
+
+        # Always check if the db file is secure
+        assert os.stat(db_path).st_mode & 0o777 == self.DEFAULT_PERMISSION
 
     def add_config(self, name, version, host, port, dbname, slot, username, password, replica_port, use_separate_receivewal_service):
         self.config_table.insert({
