@@ -3,7 +3,6 @@ import stat
 import subprocess
 import pathlib
 from time import sleep
-from pgkit.application.models import master, replica
 
 from pgkit.application.settings import DB_PATH
 
