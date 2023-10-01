@@ -73,15 +73,15 @@ def check_same_query_on_replica_and_master_expect_unsync(replica_host, replica_p
     assert master_output != replica_output
 
 
-def add_config(cluster_name, master_host, replica_slot, replica_port, use_separate_wal_receive_service=False):
+def add_config(cluster_name, master_host, replica_slot, replica_port, use_separate_receivewal_service=False):
     command = (f"pgkit config add --name {cluster_name} " +
         f"--version 12 --host {master_host}" +
         f" --port 5432 --dbname test --slot {replica_slot}" +
         f" --username testuser --password test-pass" +
         f" --replica-port {replica_port}"
     )
-    if use_separate_wal_receive_service:
-        command += " --use-separate-wal-receive-service"
+    if use_separate_receivewal_service:
+        command += " --use-separate-receivewal-service"
     subprocess.run(
         command,
         shell=True
@@ -147,7 +147,7 @@ def test_pitr_recover():
     check_same_query_on_replica_and_master_expect_unsync('replica', 5433, 'master', 5432, 'test', 'testuser', "select * from persons")
 
     subprocess.run("pgkit pitr recover pitr latest", shell=True)
-    sleep(5)
+    sleep(10)
     check_same_query_on_replica_and_master_expect_sync('replica', 5433, 'master', 5432, 'test', 'testuser', "select * from persons")
 
 
