@@ -20,4 +20,5 @@ jobs:
         run: docker-compose -f "deployment/docker-compose.yml" up -d --build
       
       - name: Run tests
+        uses: runforesight/workflow-telemetry-action@v1.8.0
         run: docker-compose -f "deployment/docker-compose.yml" exec -T replica python3 integration-test.py
