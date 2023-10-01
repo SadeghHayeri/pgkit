@@ -73,9 +73,16 @@ def check_same_query_on_replica_and_master_expect_unsync(replica_host, replica_p
     assert master_output != replica_output
 
 
-def add_config(cluster_name, master_host, replica_slot, replica_port):
+def add_config(cluster_name, master_host, replica_slot, replica_port, use_separate_wal_receive_service=False):
+    command = (f"pgkit config add --name {cluster_name} " +
+        "--version 12 --host {master_host}" +
+        " --port 5432 --dbname test --slot {replica_slot}" +
+        " --username testuser --password test-pass" +
+        " --replica-port {replica_port}")
+    if use_separate_wal_receive_service:
+        command += " --use-separate-wal-receive-service"
     subprocess.run(
-        f"pgkit config add --name {cluster_name} --version 12 --host {master_host} --port 5432 --dbname test --slot {replica_slot} --username testuser --password test-pass --replica-port {replica_port}",
+        command,
         shell=True
     )
 
@@ -129,7 +136,7 @@ def test_promote_backup():
 
 
 def test_pitr_recover():
-    add_config("pitr" , "master", "replicapitrslot", 5433)
+    add_config("pitr" , "master", "replicapitrslot", 5433, True)
 
     subprocess.run("pgkit pitr backup pitr 180", shell=True)
     open_pg_hba("pitr")
