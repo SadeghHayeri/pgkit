@@ -132,7 +132,8 @@ class Replica(Postgres):
 
     def recovery(self, target_time):
         self.configure_recovery_file(recovery=True, recovery_target_time=target_time)
-        self._rename_partial_wal_file()
+        if self.use_separate_receivewal_service:
+            self._rename_partial_wal_file()
         self.restart()
 
     def get_config_parameter_value(self, parameter):
@@ -256,7 +257,7 @@ class Replica(Postgres):
 
         config = read_file(file_location)
         for line in config.split('\n'):
-            if 'recovery_min_apply_delay' in line:
+            if line.startswith('recovery_min_apply_delay'):
                 return int(line.split(' ')[2].split("min")[0]) / 60
 
     def _get_replication_slot_status(self):

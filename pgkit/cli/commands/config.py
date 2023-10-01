@@ -13,7 +13,7 @@ def config():
 @config.command()
 @click.option('--name', help='Postgres Name', required=True, prompt=True)
 @click.option('--version', help='Postgres Version', required=True, prompt=True,
-              type=click.Choice(['9.5', '10', '11', '12', '13'], case_sensitive=False))
+              type=click.Choice(['9.5', '10', '11', '12', '13', '14', '15'], case_sensitive=False))
 @click.option('--host', help='Host IP', required=True, prompt=True)
 @click.option('--port', help='Port Number', required=True, prompt=True, type=int)
 @click.option('--dbname', help='Database Name', required=True, prompt=True)
@@ -32,7 +32,7 @@ def add(name, version, host, port, dbname, slot, username, password, replica_por
 @click.argument('name', required=True)
 @click.option('--new_name', help='Postgres New name', required=False, prompt=False)
 @click.option('--version', help='Postgres Version', required=False, prompt=False,
-              type=click.Choice(['9.5', '10', '11', '12', '13'], case_sensitive=False))
+              type=click.Choice(['9.5', '10', '11', '12', '13', '14', '15'], case_sensitive=False))
 @click.option('--host', help='Host IP', required=False, prompt=False)
 @click.option('--port', help='Port Number', required=False, prompt=False, type=int)
 @click.option('--dbname', help='Database Name', required=False, prompt=False)
