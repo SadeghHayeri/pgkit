@@ -1,4 +1,7 @@
-FROM ubuntu:22.04
+ARG OS=ubuntu
+ARG OS_VERSION=22.04
+
+FROM ${OS}:${OS_VERSION}
 
 ENV container docker
 ENV LC_ALL C
@@ -15,7 +18,8 @@ RUN apt-get update && apt-get install -y \
 	lsb-core
 RUN echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
 RUN curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-RUN apt-get update && apt-get install -y postgresql-12
+ARG POSTGRES_VERSION=13
+RUN apt-get update && apt-get install -y postgresql-${POSTGRES_VERSION}
 
 RUN pip3 install pyyaml
 

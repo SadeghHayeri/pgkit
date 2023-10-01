@@ -7,6 +7,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        OS: ${OS}
+        OS_VERSION: ${OS_VERSION}
+        POSTGRES_VERSION: ${POSTGRES_VERSION}
     hostname: master
     restart: always
     command: 'bash -c "/init.sh && sleep 3600"'
@@ -20,6 +24,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        OS: ${OS}
+        OS_VERSION: ${OS_VERSION}
+        POSTGRES_VERSION: ${POSTGRES_VERSION}
     hostname: replica
     restart: always
     command: 'bash -c "/init.sh && exec /lib/systemd/systemd" && sleep 3600'
