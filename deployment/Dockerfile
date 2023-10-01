@@ -4,16 +4,18 @@ ENV container docker
 ENV LC_ALL C
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc|sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | sudo tee  /etc/apt/sources.list.d/pgdg.list
 RUN apt-get update && apt-get install -y \
-	postgresql-12 \
+	curl \
 	python3 \
 	python3-pip \
 	systemd \
 	systemd-sysv \
 	net-tools \
-	git
+	git \
+	lsb-core
+RUN echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+RUN curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+RUN apt-get update && apt-get install -y postgresql-12
 
 RUN pip3 install pyyaml
 
