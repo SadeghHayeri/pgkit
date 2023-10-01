@@ -24,9 +24,9 @@ RUN apt-get update && apt-get install -y postgresql-${POSTGRES_VERSION}
 
 RUN pip3 install pyyaml
 
-RUN echo "listen_addresses = '*'" >> /etc/postgresql/12/main/postgresql.conf
-RUN echo "host    all             all             0.0.0.0/0               md5" >> /etc/postgresql/12/main/pg_hba.conf
-RUN echo "host    replication     all             0.0.0.0/0               md5" >> /etc/postgresql/12/main/pg_hba.conf
+RUN echo "listen_addresses = '*'" >> /etc/postgresql/${POSTGRES_VERSION}/main/postgresql.conf
+RUN echo "host    all             all             0.0.0.0/0               md5" >> /etc/postgresql/${POSTGRES_VERSION}/main/pg_hba.conf
+RUN echo "host    replication     all             0.0.0.0/0               md5" >> /etc/postgresql/${POSTGRES_VERSION}/main/pg_hba.conf
 
 RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
