@@ -22,7 +22,7 @@ services:
       dockerfile: Dockerfile
     hostname: replica
     restart: always
-    command: 'bash -c "/init.sh && exec /lib/systemd/systemd"'
+    command: 'bash -c "/init.sh && exec /lib/systemd/systemd" && sleep 3600'
     privileged: true
     volumes:
       - ./init.sh:/init.sh:ro
