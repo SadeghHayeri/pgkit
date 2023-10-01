@@ -18,6 +18,8 @@ if [[ $(hostname) == "master" ]]; then
 EOF
 else
 	pg_lsclusters
+	pg_ctlcluster 12 main stop
+	pg_ctlcluster 12 main restart
 	echo "Don't forget to run postgresql manually!"
 	echo "Run pg_ctlcluster 12 main stop && pg_ctlcluster 12 main restart"
 fi
