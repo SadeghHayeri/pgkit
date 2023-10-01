@@ -70,6 +70,7 @@ def recover(name, target_time):
         config['password'],
         config['slot'],
         config['replica_port'],
+        config.get('use_separate_receivewal_service', False),
         time_to_recover=target_time
     )
 

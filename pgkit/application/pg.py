@@ -26,9 +26,10 @@ def shell(name, host, port, version, dbname, username, password, slot, replica_p
         master.shell()
 
 
-def recovery(name, host, port, version, dbname, username, password, slot, replica_port, time_to_recover):
+def recovery(name, host, port, version, dbname, username, password, slot, 
+             replica_port, use_separate_receivewal_service, time_to_recover):
     master = Master(name, host, port, version, dbname, username, password, slot)
-    replica = Replica(master, replica_port, None)
+    replica = Replica(master, replica_port, None, use_separate_receivewal_service)
 
     replica.recovery(time_to_recover)
 
