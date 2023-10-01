@@ -22,5 +22,8 @@ jobs:
       - name: Start containers
         run: docker-compose -f "deployment/docker-compose.yml" up -d --build
       
+      - name: Sleep so containers are ready
+        run: sleep 30
+      
       - name: Run tests
         run: docker-compose -f "deployment/docker-compose.yml" exec -T replica python3 integration-test.py
