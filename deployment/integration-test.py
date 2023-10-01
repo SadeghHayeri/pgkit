@@ -6,8 +6,8 @@ from time import sleep
 
 from pgkit.application.settings import DB_PATH
 
-
-EXPECTED_CONFIG = '{"config": {"1": {"name": "main", "version": "12", "host": "master", "port": 5432, "dbname": "test", "slot": "replicaslottest", "username": "testuser", "password": "test-pass", "replica_port": "5432", "use_separate_receivewal_service": false, "max_connections": 100, "max_worker_processes": 8}}}'
+POSTGRES_VERSION = os.getenv("POSTGRES_VERSION")
+EXPECTED_CONFIG = f'{{"config": {{"1": {{"name": "main", "version": "{POSTGRES_VERSION}", "host": "master", "port": 5432, "dbname": "test", "slot": "replicaslottest", "username": "testuser", "password": "test-pass", "replica_port": "5432", "use_separate_receivewal_service": false, "max_connections": 100, "max_worker_processes": 8}}}}}}'
 
 pgpass_file = str(pathlib.Path.home()) + '/.pgpass'
 with open(pgpass_file, 'w+') as f:
@@ -43,8 +43,8 @@ def check_successful_insert(host, port, dbname, username, id, lastname, firstnam
 
 
 def open_pg_hba(cluster_name):
-    subprocess.run(f"echo \"host    all             all             0.0.0.0/0               md5\" >> /etc/postgresql/12/{cluster_name}/pg_hba.conf", shell=True)
-    subprocess.run(f"systemctl reload postgresql@12-{cluster_name}.service", shell=True)
+    subprocess.run(f"echo \"host    all             all             0.0.0.0/0               md5\" >> /etc/postgresql/{POSTGRES_VERSION}/{cluster_name}/pg_hba.conf", shell=True)
+    subprocess.run(f"systemctl reload postgresql@{POSTGRES_VERSION}-{cluster_name}.service", shell=True)
 
 
 def check_config(actual_config):
@@ -75,7 +75,7 @@ def check_same_query_on_replica_and_master_expect_unsync(replica_host, replica_p
 
 def add_config(cluster_name, master_host, replica_slot, replica_port, use_separate_receivewal_service=False):
     command = (f"pgkit config add --name {cluster_name} " +
-        f"--version 12 --host {master_host}" +
+        f"--version {POSTGRES_VERSION} --host {master_host}" +
         f" --port 5432 --dbname test --slot {replica_slot}" +
         f" --username testuser --password test-pass" +
         f" --replica-port {replica_port}"
@@ -110,7 +110,7 @@ def test_get_config():
     assert output[8] == "slot: replicaslottest"
     assert output[9] == "use_separate_receivewal_service: false"
     assert output[10] == "username: testuser"
-    assert output[11] == "version: '12'"
+    assert output[11] == f"version: '{POSTGRES_VERSION}'"
 
 
 def test_pitr_0_delay_backup():
