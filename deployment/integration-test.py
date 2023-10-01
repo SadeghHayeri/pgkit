@@ -145,7 +145,8 @@ def test_pitr_recover():
     check_same_query_on_replica_and_master_expect_sync('replica', 5433, 'master', 5432, 'test', 'testuser', "select * from persons")
     check_successful_insert('master', 5432, 'test', 'testuser', 3, 'Eleven', 'Eleven', 15)
     check_same_query_on_replica_and_master_expect_unsync('replica', 5433, 'master', 5432, 'test', 'testuser', "select * from persons")
-
+    
+    sleep(10)
     subprocess.run("pgkit pitr recover pitr latest", shell=True)
     sleep(10)
     check_same_query_on_replica_and_master_expect_sync('replica', 5433, 'master', 5432, 'test', 'testuser', "select * from persons")
