@@ -75,10 +75,11 @@ def check_same_query_on_replica_and_master_expect_unsync(replica_host, replica_p
 
 def add_config(cluster_name, master_host, replica_slot, replica_port, use_separate_wal_receive_service=False):
     command = (f"pgkit config add --name {cluster_name} " +
-        "--version 12 --host {master_host}" +
-        " --port 5432 --dbname test --slot {replica_slot}" +
-        " --username testuser --password test-pass" +
-        " --replica-port {replica_port}")
+        f"--version 12 --host {master_host}" +
+        f" --port 5432 --dbname test --slot {replica_slot}" +
+        f" --username testuser --password test-pass" +
+        f" --replica-port {replica_port}"
+    )
     if use_separate_wal_receive_service:
         command += " --use-separate-wal-receive-service"
     subprocess.run(
