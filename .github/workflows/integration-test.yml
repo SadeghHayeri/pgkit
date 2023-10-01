@@ -14,7 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: runforesight/workflow-telemetry-action@v1.8.0
+      - uses: actions/checkout@v2
+
+      - name: Collect Workflow Telemetry
+        uses: runforesight/workflow-telemetry-action@v1
 
       - name: Start containers
         run: docker-compose -f "deployment/docker-compose.yml" up -d --build
