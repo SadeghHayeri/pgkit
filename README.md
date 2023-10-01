@@ -57,12 +57,12 @@ $ sudo pgkit config add \
   --username <host-username> \
   --password <host-password> \
   --replica-port <replica-port> \
-  --use-separate-wal-receive-service
+  --use-separate-receivewal-service
 ```
 
-The `replica-port` and `use-separate-wal-receive-service` flags are optional.<br>
+The `replica-port` and `use-separate-receivewal-service` flags are optional.<br>
 The `replica-port` specifies the port on which the replica listens.<br>
-The `use-separate-wal-receive-service` flag specifies if pgkit should use a separate service to receive the WAL files
+The `use-separate-receivewal-service` flag specifies if pgkit should use a separate service to receive the WAL files
 from the host or to let the postgres cluster handle receiving the WAL files itself.
 
 > **Important:** It's best to use a separate receivewal service (set the flag) if setting up a delayed replica (PITR). If setting
