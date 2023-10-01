@@ -12,6 +12,7 @@ on:
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu]
         os_version: [20.04, 22.04]
