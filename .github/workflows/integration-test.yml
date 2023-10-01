@@ -14,11 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: runforesight/workflow-telemetry-action@v1.8.0
 
       - name: Start containers
         run: docker-compose -f "deployment/docker-compose.yml" up -d --build
       
       - name: Run tests
-        uses: runforesight/workflow-telemetry-action@v1.8.0
         run: docker-compose -f "deployment/docker-compose.yml" exec -T replica python3 integration-test.py
