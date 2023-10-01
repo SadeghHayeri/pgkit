@@ -28,9 +28,9 @@ jobs:
       - name: Start containers
         run: docker-compose -f "deployment/docker-compose.yml" up -d --build
         env:
-          OS: ${{os}}
-          OS_VERSION: ${{os_version}}
-          POSTGRES_VERSION: ${{postgres_version}}
+          OS: ${{matrix.os}}
+          OS_VERSION: ${{matrix.os_version}}
+          POSTGRES_VERSION: ${{matrix.postgres_version}}
       
       - name: Sleep so containers are ready
         run: sleep 15
