@@ -46,6 +46,11 @@ def open_pg_hba(cluster_name):
     subprocess.run(f"echo \"host    all             all             0.0.0.0/0               md5\" >> /etc/postgresql/{POSTGRES_VERSION}/{cluster_name}/pg_hba.conf", shell=True)
     subprocess.run(f"systemctl reload postgresql@{POSTGRES_VERSION}-{cluster_name}.service", shell=True)
 
+def listen_on_all_interfaces(cluster_name):
+    print(POSTGRES_VERSION)
+    print(f"echo \"listen_addresses = '*'\" >> /etc/postgresql/{POSTGRES_VERSION}/{cluster_name}/postgresql.conf")
+    subprocess.run(f"echo \"listen_addresses = '*'\" >> /etc/postgresql/{POSTGRES_VERSION}/{cluster_name}/postgresql.conf", shell=True)
+    subprocess.run(f"systemctl restart postgresql@{POSTGRES_VERSION}-{cluster_name}.service", shell=True)
 
 def check_config(actual_config):
     assert actual_config == EXPECTED_CONFIG, f"{actual_config} is not equal to expected config {EXPECTED_CONFIG}"
@@ -116,6 +121,7 @@ def test_get_config():
 def test_pitr_0_delay_backup():
     subprocess.run("pgkit pitr backup main 0", shell=True)
     open_pg_hba("main")
+    listen_on_all_interfaces("main")
     check_same_query_on_replica_and_master_expect_sync('replica', 5432, 'master', 5432, 'test', 'testuser', "select * from persons")
     check_successful_insert('master', 5432, 'test', 'testuser', 2, 'Alice', 'Wonderlander', 17)
     sleep(5)
@@ -141,6 +147,7 @@ def test_pitr_recover():
 
     subprocess.run("pgkit pitr backup pitr 180", shell=True)
     open_pg_hba("pitr")
+    listen_on_all_interfaces("pitr")
 
     check_same_query_on_replica_and_master_expect_sync('replica', 5433, 'master', 5432, 'test', 'testuser', "select * from persons")
     check_successful_insert('master', 5432, 'test', 'testuser', 3, 'Eleven', 'Eleven', 15)
